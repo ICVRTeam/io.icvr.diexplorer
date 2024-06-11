@@ -1,0 +1,7 @@
+include:
+  - project: "ICVR/UnityPackages/Templates"
+    file: "/nexus.gitlab-ci.yml"
+
+variables:
+  PACKAGE_ROOT: Packages/Source
+

@@ -1,0 +1,72 @@
+# =============== #
+# Unity generated #
+# =============== #
+Temp/
+obj.meta
+Obj/
+#bin.meta # UnityPurchasing contains the Bin folder, wtf?
+#Bin/ # UnityPurchasing contains the Bin folder, wtf?
+/UnityGenerated/
+/Library/*
+!/Library/NetCode/
+!/Library/com.unity.addressables/
+/Recordings/
+/ServerData/
+/Logs/
+/bin/
+
+# ============================================= #
+# Visual Studio / MonoDevelop generated / Rider #
+# ============================================= #
+ExportedObj/
+.idea/
+*.svd
+*.userprefs
+/*.csproj
+*.pidb
+*.suo
+*.sln
+*.user
+*.unityproj
+*.booproj
+.vscode/
+
+# ============ #
+# OS generated #
+# ============ #
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+# Builds
+/Build
+/ios
+/android
+/win64
+/macos
+
+# Visual studio
+.vs
+*.VC.opendb
+*.sdf
+*.csproj.meta
+
+#Rider
+Assets/Plugins/Editor/JetBrains
+Assets/Plugins/Editor/JetBrains.meta
+Assets/Plugins/Editor.meta
+
+#Debug
+Assets/Config/DebugSettings*
+Assets/Resources/DebugSettings*
+/UserSettings/
+**/bin/
+**/obj/
+/.Net Test/
+*.bak
+/.Net Solution/

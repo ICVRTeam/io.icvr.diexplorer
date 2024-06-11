@@ -1,0 +1,7 @@
+Assets/.idea/
+Assets/.vs/
+*.log
+*.db
+**/obj/*
+**/bin/*
+/Assets/.idea/*
