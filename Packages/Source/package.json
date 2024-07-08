@@ -3,7 +3,7 @@
   "displayName": "Unity DI Explorer",
   "name": "io.icvr.diexplorer",
   "unity": "2021.1",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "dependencies": {
     "com.svermeulen.extenject": "9.3.1",
 	"com.neuecc.unirx": "7.1.0",

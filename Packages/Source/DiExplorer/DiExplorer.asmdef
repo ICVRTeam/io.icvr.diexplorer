@@ -8,10 +8,14 @@
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
+    "overrideReferences": true,
     "precompiledReferences": [
-        "Unity.Plastic.Newtonsoft.Json.dll",
-        "Zenject-usage.dll"
+        "Zenject-usage.dll",
+        "unityplastic.dll",
+        "log4netPlastic.dll",
+        "Newtonsoft.Json.dll",
+        "Unity.Plastic.Antlr3.Runtime.dll",
+        "Unity.Plastic.Newtonsoft.Json.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],
