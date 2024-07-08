@@ -15,7 +15,7 @@
 
 using DiExplorer.Data;
 using DiExplorer.Interfaces;
-using Unity.Plastic.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace DiExplorer.Entities
 {

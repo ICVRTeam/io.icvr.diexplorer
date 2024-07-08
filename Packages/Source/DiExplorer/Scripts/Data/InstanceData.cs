@@ -15,7 +15,7 @@
 
 using System;
 using DiContainerDebugger.Scripts;
-using Unity.Plastic.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace DiExplorer.Data
 {

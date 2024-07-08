@@ -17,8 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using DiExplorer.Data;
 using DiExplorer.Extensions;
-using DiExplorer.Interfaces;
-using Unity.Plastic.Newtonsoft.Json;
 
 namespace DiExplorer.Entities
 {

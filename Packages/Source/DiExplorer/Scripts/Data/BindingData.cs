@@ -14,7 +14,7 @@
 // from ICVR LLC.
 
 using System;
-using Unity.Plastic.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace DiExplorer.Data
 {
