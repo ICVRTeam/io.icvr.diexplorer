@@ -11,11 +11,7 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "Zenject-usage.dll",
-        "unityplastic.dll",
-        "log4netPlastic.dll",
-        "Newtonsoft.Json.dll",
-        "Unity.Plastic.Antlr3.Runtime.dll",
-        "Unity.Plastic.Newtonsoft.Json.dll"
+        "Newtonsoft.Json.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],
