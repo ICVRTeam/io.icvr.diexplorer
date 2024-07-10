@@ -49,5 +49,13 @@ namespace DiContainerDebugger.Editor.Styles
             hover = { textColor = new Color(0.42f, 0.78f, 1f) }, // при наведении курсора
             onNormal = { textColor = new Color(0.24f, 0.49f, 0.91f) }
         };
+        
+#if UNITY_2022_3_OR_NEWER
+        public static readonly GUIStyle ToolbarSearchTextField = GUI.skin.FindStyle("ToolbarSearchTextField");
+        public static readonly GUIStyle ToolbarSearchCancelButton = GUI.skin.FindStyle("ToolbarSearchCancelButton");
+#else
+        public static readonly GUIStyle ToolbarSearchTextField = GUI.skin.FindStyle("ToolbarSeachTextField");
+        public static readonly GUIStyle ToolbarSearchCancelButton = GUI.skin.FindStyle("ToolbarSeachCancelButton");
+#endif
     }
 }

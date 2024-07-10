@@ -235,9 +235,9 @@ namespace DiContainerDebugger.Editor
                     GUILayout.BeginHorizontal(GUI.skin.FindStyle("Toolbar"), GUILayout.Width(position.width / 4f));
                     {
                         _bindingsPanel.SetBindingsSearchString(GUILayout.TextField(_bindingsPanel.BindingsSearchString,
-                            GUI.skin.FindStyle("ToolbarSeachTextField"),
+                            EditorElementStyle.ToolbarSearchTextField,
                             GUILayout.ExpandWidth(true)));
-                        if (GUILayout.Button("", GUI.skin.FindStyle("ToolbarSeachCancelButton")))
+                        if (GUILayout.Button("", EditorElementStyle.ToolbarSearchCancelButton))
                         {
                             _bindingsPanel.SetBindingsSearchString(string.Empty);
                             GUI.FocusControl(null);
@@ -364,11 +364,10 @@ namespace DiContainerDebugger.Editor
                     // Subscriptions Search String
                     GUILayout.BeginHorizontal(GUI.skin.FindStyle("Toolbar"), GUILayout.Width(position.width / 4f));
                     {
-                        //This Style fixed in Unity 2022.3
                         _signalsPanel.SetSearchString(GUILayout.TextField(_signalsPanel.SubscriptionsSearchString,
-                            GUI.skin.FindStyle("ToolbarSeachTextField"),
+                            EditorElementStyle.ToolbarSearchTextField,
                             GUILayout.ExpandWidth(true)));
-                        if (GUILayout.Button("", GUI.skin.FindStyle("ToolbarSeachCancelButton")))
+                        if (GUILayout.Button("", EditorElementStyle.ToolbarSearchCancelButton))
                         {
                             _signalsPanel.SetSearchString(string.Empty);
                             GUI.FocusControl(null);
