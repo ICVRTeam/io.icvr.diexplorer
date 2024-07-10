@@ -22,12 +22,12 @@ namespace DiExplorer.Entities
 {
     internal class DiExplorerModel
     {
-        private Dictionary<string, BindingData[]> _containerBindings = new Dictionary<string, BindingData[]>();
-        private Dictionary<string, InstanceData[]> _containerInstances = new Dictionary<string, InstanceData[]>();
+        private readonly Dictionary<string, BindingData[]> _containerBindings = new Dictionary<string, BindingData[]>();
+        private readonly Dictionary<string, InstanceData[]> _containerInstances = new Dictionary<string, InstanceData[]>();
 
-        private Dictionary<string, SignalData[]> _containerSignals = new Dictionary<string, SignalData[]>();
-        private Dictionary<string, SubscriptionData[]> _containerSubscriptions = new Dictionary<string, SubscriptionData[]>();
-        private Dictionary<string, SignalCallData[]> _signalCalls = new Dictionary<string, SignalCallData[]>();
+        private readonly Dictionary<string, SignalData[]> _containerSignals = new Dictionary<string, SignalData[]>();
+        private readonly Dictionary<string, SubscriptionData[]> _containerSubscriptions = new Dictionary<string, SubscriptionData[]>();
+        private readonly Dictionary<string, SignalCallData[]> _signalCalls = new Dictionary<string, SignalCallData[]>();
 
         public string[] GetContainerNames()
         {
@@ -159,7 +159,12 @@ namespace DiExplorer.Entities
         
         public void SetSignalCalls(Dictionary<string, SignalCallData[]> signalCalls)
         {
-            _signalCalls = signalCalls;
+            _signalCalls.Clear();
+            
+            foreach (var signalCall in signalCalls)
+            {
+                _signalCalls.Add(signalCall.Key, signalCall.Value);
+            }
         }
 
         internal SavedData GetSavedData()
@@ -172,11 +177,36 @@ namespace DiExplorer.Entities
 
         public void SetSavedData(SavedData savedData)
         {
-            _containerBindings = savedData.ContainerBindings;
-            _containerInstances = savedData.ContainerInstances;
-            _containerSignals = savedData.ContainerSignals;
-            _containerSubscriptions = savedData.ContainerSubscriptions;
-            _signalCalls = savedData.SignalCalls;
+            _containerBindings.Clear();
+            _containerInstances.Clear();
+            _containerSignals.Clear();
+            _containerSubscriptions.Clear();
+            _signalCalls.Clear();
+
+            foreach (var containerBinding in savedData.ContainerBindings)
+            {
+                _containerBindings.Add(containerBinding.Key, containerBinding.Value);
+            }
+
+            foreach (var containerInstance in savedData.ContainerInstances)
+            {
+                _containerInstances.Add(containerInstance.Key, containerInstance.Value);
+            }
+
+            foreach (var containerSignal in savedData.ContainerSignals)
+            {
+                _containerSignals.Add(containerSignal.Key, containerSignal.Value);
+            }
+
+            foreach (var containerSubscription in savedData.ContainerSubscriptions)
+            {
+                _containerSubscriptions.Add(containerSubscription.Key, containerSubscription.Value);   
+            }
+
+            foreach (var signalCall in savedData.SignalCalls)
+            {
+                _signalCalls.Add(signalCall.Key, signalCall.Value);
+            }
         }
     }
 }

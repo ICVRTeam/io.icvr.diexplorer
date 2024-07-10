@@ -63,6 +63,12 @@ namespace DiExplorer.Containers
             {
                 var componentType = component.GetType();
                 var typeInfo = TypeAnalyzer.TryGetInfo(componentType);
+                
+                if (typeInfo == null)
+                {
+                    continue;
+                }
+                
                 var injectables = typeInfo.AllInjectables.ToArray();
 
                 if (injectables.Any())

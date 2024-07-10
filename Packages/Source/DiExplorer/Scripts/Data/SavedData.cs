@@ -19,11 +19,11 @@ namespace DiExplorer.Data
 {
     internal struct SavedData
     {
-        public Dictionary<string, BindingData[]> ContainerBindings;
-        public Dictionary<string, InstanceData[]> ContainerInstances;
-        public Dictionary<string, SignalData[]> ContainerSignals;
-        public Dictionary<string, SubscriptionData[]> ContainerSubscriptions;
-        public Dictionary<string, SignalCallData[]> SignalCalls;
+        public readonly Dictionary<string, BindingData[]> ContainerBindings;
+        public readonly Dictionary<string, InstanceData[]> ContainerInstances;
+        public readonly Dictionary<string, SignalData[]> ContainerSignals;
+        public readonly Dictionary<string, SubscriptionData[]> ContainerSubscriptions;
+        public readonly Dictionary<string, SignalCallData[]> SignalCalls;
 
         public SavedData(
             Dictionary<string, BindingData[]> containerBindings,
