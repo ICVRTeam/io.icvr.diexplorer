@@ -82,6 +82,12 @@ namespace DiExplorer.Containers
                         {
                             var instanceType = instance.GetType();
                             var typeInfo = TypeAnalyzer.TryGetInfo(instanceType);
+                            
+                            if (typeInfo == null)
+                            {
+                                continue;
+                            }
+                            
                             var injectables = typeInfo.AllInjectables.ToArray();
                             var injectableTypes = new List<string>();
                             

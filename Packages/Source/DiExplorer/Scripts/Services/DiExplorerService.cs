@@ -89,7 +89,42 @@ namespace DiExplorer.Services
         {
             var stringData = _dependenciesRepository.Load();
             var savedData = _serializator.Deserialize(stringData);
-            _diExplorerModel.SetSavedData(savedData);
+
+            var containerBindings = new Dictionary<string, BindingData[]>();
+            var containerInstances = new Dictionary<string, InstanceData[]>();
+            var containerSignals = new Dictionary<string, SignalData[]>();
+            var containerSubscriptions = new Dictionary<string, SubscriptionData[]>();
+            var signalCalls = new Dictionary<string, SignalCallData[]>();
+
+            if (savedData.ContainerBindings != null)
+            {
+                containerBindings = savedData.ContainerBindings;
+            }
+
+            if (savedData.ContainerInstances != null)
+            {
+                containerInstances = savedData.ContainerInstances;
+            }
+
+            if (savedData.ContainerSignals != null)
+            {
+                containerSignals = savedData.ContainerSignals;
+            }
+
+            if (savedData.ContainerSubscriptions != null)
+            {
+                containerSubscriptions = savedData.ContainerSubscriptions;
+            }
+
+            if (savedData.SignalCalls != null)
+            {
+                signalCalls = savedData.SignalCalls;
+            }
+
+            var newSavedData = new SavedData(containerBindings, containerInstances, containerSignals,
+                containerSubscriptions, signalCalls);
+            
+            _diExplorerModel.SetSavedData(newSavedData);
         }
 
         public BindingData[] GetBindings(string containerName)

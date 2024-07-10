@@ -49,6 +49,7 @@ namespace DiContainerDebugger.Editor
         private Vector2 _bindingsScrollPosition;
         private Vector2 _signalsScrollPosition;
         private Vector2 _subscriptionsScrollPosition;
+        private Vector2 _signalCallsScrollPosition;
         
         private int _relatedItemsSelectedIndex = Unselected;
 
@@ -334,8 +335,6 @@ namespace DiContainerDebugger.Editor
                 
             EditorGUILayout.Separator();
         }
-
-        private Vector2 scrollPos;
         
         private void OnGUIRightContainer()
         {
@@ -438,7 +437,8 @@ namespace DiContainerDebugger.Editor
                 EditorGUILayout.BeginVertical();
                 {
                     EditorGUILayout.LabelField("Signal Calls", EditorStyles.boldLabel);
-                    scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+                    
+                    _signalCallsScrollPosition = EditorGUILayout.BeginScrollView(_signalCallsScrollPosition);
                     {
                         GUILayout.BeginHorizontal();
 
