@@ -56,7 +56,7 @@ namespace DiExplorer.Containers
             
             foreach (var classType in bindedClassTypes)
             {
-                bindedClassDataList.Add(RecursiveGetInjectables(contextName, classType));
+                bindedClassDataList.Add(GetInjectables(contextName, classType));
             }
 
             return bindedClassDataList.ToArray();
@@ -113,22 +113,22 @@ namespace DiExplorer.Containers
             return instancesDataList.ToArray();
         }
 
-        private BindingData RecursiveGetInjectables(string contextName, Type classType)
+        private BindingData GetInjectables(string contextName, Type classType)
         {
-            var injectablesBindingDataList = new List<BindingData>();
+            var injectablesTypeList = new List<Type>();
             var isMonoBehaviour = classType.BaseType == typeof(MonoBehaviour);
             var typeInfo = TypeAnalyzer.TryGetInfo(classType);
             
             if (typeInfo == null)
             {
-                return new BindingData(contextName, classType.ToString(), injectablesBindingDataList.ToArray(), isMonoBehaviour);
+                return new BindingData(contextName, classType.ToString(), injectablesTypeList.ToArray(), isMonoBehaviour);
             }
             
             var injectables = typeInfo.AllInjectables.ToArray();
 
             if (!injectables.Any())
             {
-                return new BindingData(contextName, classType.ToString(), injectablesBindingDataList.ToArray(), isMonoBehaviour);
+                return new BindingData(contextName, classType.ToString(), injectablesTypeList.ToArray(), isMonoBehaviour);
             }
             
             var injectableTypes = injectables.Select(info => info.MemberType).ToArray(); // get injectable types
@@ -136,13 +136,14 @@ namespace DiExplorer.Containers
             foreach (var injectableType in injectableTypes)
             {
                 if (injectableType == classType)
+                {
                     break;
-                // Recursive call to get the injectables for the current injectable type
-                var injectableBindingData = RecursiveGetInjectables(contextName, injectableType);
-                injectablesBindingDataList.Add(injectableBindingData);
+                }
+                
+                injectablesTypeList.Add(injectableType);
             }
 
-            return new BindingData(contextName, classType.ToString(), injectablesBindingDataList.ToArray(), isMonoBehaviour);
+            return new BindingData(contextName, classType.ToString(), injectablesTypeList.ToArray(), isMonoBehaviour);
         }
 
         public virtual SubscriptionData[] GetSubscriptions()

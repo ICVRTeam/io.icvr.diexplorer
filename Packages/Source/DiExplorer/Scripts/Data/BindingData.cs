@@ -23,15 +23,15 @@ namespace DiExplorer.Data
     {
         public string ParentContextName { get; }
         public string TypeName { get; }
-        public BindingData[] Injectables { get; }
+        public Type[] InjectablesType { get; }
         public bool IsMonoBehaviour { get; }
 
         [JsonConstructor]
-        public BindingData(string parentContextName, string typeName, BindingData[] injectables, bool isMonoBehaviour = false)
+        public BindingData(string parentContextName, string typeName, Type[] injectablesType, bool isMonoBehaviour = false)
         {
             ParentContextName = parentContextName;
             TypeName = typeName;
-            Injectables = injectables;
+            InjectablesType = injectablesType;
             IsMonoBehaviour = isMonoBehaviour;
         }
     }
