@@ -1,0 +1,1483 @@
+{
+  "ContainerBindings": {
+    "Project": [
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.DiContainer",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.IInstantiator",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.LazyInject`1[T]",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.ZenjectSettings",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.ZenjectSceneLoader",
+        "Injectables": [
+          {
+            "ParentContextName": "Project",
+            "TypeName": "Zenject.SceneContext",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "Zenject.ProjectKernel",
+            "Injectables": [
+              {
+                "ParentContextName": "Project",
+                "TypeName": "Zenject.ZenjectSettings",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "Project",
+                "TypeName": "Zenject.SceneContextRegistry",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              }
+            ],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.TickableManager",
+        "Injectables": [
+          {
+            "ParentContextName": "Project",
+            "TypeName": "System.Collections.Generic.List`1[Zenject.ITickable]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "System.Collections.Generic.List`1[Zenject.IFixedTickable]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "System.Collections.Generic.List`1[Zenject.ILateTickable]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.InitializableManager",
+        "Injectables": [
+          {
+            "ParentContextName": "Project",
+            "TypeName": "System.Collections.Generic.List`1[Zenject.IInitializable]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.DisposableManager",
+        "Injectables": [
+          {
+            "ParentContextName": "Project",
+            "TypeName": "System.Collections.Generic.List`1[System.IDisposable]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "System.Collections.Generic.List`1[Zenject.ILateDisposable]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.Context",
+        "Injectables": [],
+        "IsMonoBehaviour": true
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.ProjectKernel",
+        "Injectables": [
+          {
+            "ParentContextName": "Project",
+            "TypeName": "Zenject.ZenjectSettings",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "Zenject.SceneContextRegistry",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.MonoKernel",
+        "Injectables": [
+          {
+            "ParentContextName": "Project",
+            "TypeName": "Zenject.TickableManager",
+            "Injectables": [
+              {
+                "ParentContextName": "Project",
+                "TypeName": "System.Collections.Generic.List`1[Zenject.ITickable]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "Project",
+                "TypeName": "System.Collections.Generic.List`1[Zenject.IFixedTickable]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "Project",
+                "TypeName": "System.Collections.Generic.List`1[Zenject.ILateTickable]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "Project",
+                "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "Project",
+                "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "Project",
+                "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              }
+            ],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "Zenject.InitializableManager",
+            "Injectables": [
+              {
+                "ParentContextName": "Project",
+                "TypeName": "System.Collections.Generic.List`1[Zenject.IInitializable]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "Project",
+                "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              }
+            ],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "Zenject.DisposableManager",
+            "Injectables": [
+              {
+                "ParentContextName": "Project",
+                "TypeName": "System.Collections.Generic.List`1[System.IDisposable]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "Project",
+                "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "Project",
+                "TypeName": "System.Collections.Generic.List`1[Zenject.ILateDisposable]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "Project",
+                "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              }
+            ],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "Zenject.IDecoratableMonoKernel",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": true
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.SceneContextRegistry",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "DiExplorer.Entities.DiExplorerModel",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "DiExplorer.Services.DiExplorerService",
+        "Injectables": [
+          {
+            "ParentContextName": "Project",
+            "TypeName": "System.Collections.Generic.List`1[DiExplorer.Containers.AbstractContainer]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "DiExplorer.Entities.DiExplorerModel",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "DiExplorer.Storages.DependenciesRepository",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "DiExplorer.Entities.PlayModeTimer",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "DiExplorer.Interfaces.ISerializator",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "DiExplorer.Storages.DependenciesRepository",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "DiExplorer.Interfaces.ISerializator",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "DiExplorer.Entities.PlayModeTimer",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "DiExplorer.Entities.SignalCallsCollector",
+        "Injectables": [
+          {
+            "ParentContextName": "Project",
+            "TypeName": "DiExplorer.Services.DiExplorerService",
+            "Injectables": [
+              {
+                "ParentContextName": "Project",
+                "TypeName": "System.Collections.Generic.List`1[DiExplorer.Containers.AbstractContainer]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "Project",
+                "TypeName": "DiExplorer.Entities.DiExplorerModel",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "Project",
+                "TypeName": "DiExplorer.Storages.DependenciesRepository",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "Project",
+                "TypeName": "DiExplorer.Entities.PlayModeTimer",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "Project",
+                "TypeName": "DiExplorer.Interfaces.ISerializator",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              }
+            ],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "DiExplorer.Containers.AbstractContainer",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.IInitializable",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "System.IDisposable",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "TestEnvironment.Services.DebugLogService",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.ILateDisposable",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.SignalBus",
+        "Injectables": [
+          {
+            "ParentContextName": "Project",
+            "TypeName": "System.Collections.Generic.List`1[Zenject.SignalDeclaration]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.SignalSubscription+Pool",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.IMemoryPool",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "ModestTree.Util.ValuePair`2[System.Type,System.Int32]",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.SignalDeclaration+Factory",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.SignalDeclaration",
+        "Injectables": [
+          {
+            "ParentContextName": "Project",
+            "TypeName": "Zenject.SignalDeclarationBindInfo",
+            "Injectables": [
+              {
+                "ParentContextName": "Project",
+                "TypeName": "System.Type",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              }
+            ],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "Zenject.ZenjectSettings",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "TestEnvironment.Signals.Greeter3",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "TestEnvironment.Signals.Greeter3",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      }
+    ],
+    "TestScene1": [
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.DiContainer",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.IInstantiator",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.LazyInject`1[T]",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.TickableManager",
+        "Injectables": [
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "System.Collections.Generic.List`1[Zenject.ITickable]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "System.Collections.Generic.List`1[Zenject.IFixedTickable]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "System.Collections.Generic.List`1[Zenject.ILateTickable]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.InitializableManager",
+        "Injectables": [
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "System.Collections.Generic.List`1[Zenject.IInitializable]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.DisposableManager",
+        "Injectables": [
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "System.Collections.Generic.List`1[System.IDisposable]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "System.Collections.Generic.List`1[Zenject.ILateDisposable]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.ILateDisposable",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.SignalBus",
+        "Injectables": [
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "System.Collections.Generic.List`1[Zenject.SignalDeclaration]",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.IInitializable",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.Context",
+        "Injectables": [],
+        "IsMonoBehaviour": true
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.SceneContext",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "System.IDisposable",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "ModestTree.Util.ValuePair`2[System.Type,System.Int32]",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.SceneKernel",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.MonoKernel",
+        "Injectables": [
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "Zenject.TickableManager",
+            "Injectables": [
+              {
+                "ParentContextName": "TestScene1",
+                "TypeName": "System.Collections.Generic.List`1[Zenject.ITickable]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "TestScene1",
+                "TypeName": "System.Collections.Generic.List`1[Zenject.IFixedTickable]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "TestScene1",
+                "TypeName": "System.Collections.Generic.List`1[Zenject.ILateTickable]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "TestScene1",
+                "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "TestScene1",
+                "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "TestScene1",
+                "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              }
+            ],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "Zenject.InitializableManager",
+            "Injectables": [
+              {
+                "ParentContextName": "TestScene1",
+                "TypeName": "System.Collections.Generic.List`1[Zenject.IInitializable]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "TestScene1",
+                "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              }
+            ],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "Zenject.DisposableManager",
+            "Injectables": [
+              {
+                "ParentContextName": "TestScene1",
+                "TypeName": "System.Collections.Generic.List`1[System.IDisposable]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "TestScene1",
+                "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "TestScene1",
+                "TypeName": "System.Collections.Generic.List`1[Zenject.ILateDisposable]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "TestScene1",
+                "TypeName": "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              }
+            ],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "Zenject.IDecoratableMonoKernel",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": true
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.ZenjectSceneLoader",
+        "Injectables": [
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "Zenject.SceneContext",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "Zenject.ProjectKernel",
+            "Injectables": [
+              {
+                "ParentContextName": "TestScene1",
+                "TypeName": "Zenject.ZenjectSettings",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              },
+              {
+                "ParentContextName": "TestScene1",
+                "TypeName": "Zenject.SceneContextRegistry",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              }
+            ],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Views.TestBindingInstanceComponent",
+        "Injectables": [
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "TestEnvironment.Services.DebugLogService",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": true
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Services.LoadSceneService",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Factrories.TestInstanceFactory",
+        "Injectables": [
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "Zenject.DiContainer",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Interfaces.IInformant",
+        "Injectables": [],
+        "IsMonoBehaviour": false
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.SignalDeclaration",
+        "Injectables": [
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "Zenject.SignalDeclarationBindInfo",
+            "Injectables": [
+              {
+                "ParentContextName": "TestScene1",
+                "TypeName": "System.Type",
+                "Injectables": [],
+                "IsMonoBehaviour": false
+              }
+            ],
+            "IsMonoBehaviour": false
+          },
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "Zenject.ZenjectSettings",
+            "Injectables": [],
+            "IsMonoBehaviour": false
+          }
+        ],
+        "IsMonoBehaviour": false
+      }
+    ]
+  },
+  "ContainerInstances": {
+    "Project": [
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.TickableManager",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "System.Collections.Generic.List`1[Zenject.ITickable]",
+          "System.Collections.Generic.List`1[Zenject.IFixedTickable]",
+          "System.Collections.Generic.List`1[Zenject.ILateTickable]",
+          "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+          "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+          "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.InitializableManager",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "System.Collections.Generic.List`1[Zenject.IInitializable]",
+          "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.DisposableManager",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "System.Collections.Generic.List`1[System.IDisposable]",
+          "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+          "System.Collections.Generic.List`1[Zenject.ILateDisposable]",
+          "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.ProjectKernel",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "Zenject.ZenjectSettings",
+          "Zenject.SceneContextRegistry"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.SceneContextRegistry",
+        "InstanceType": 0,
+        "InjectablesTypeName": []
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "DiExplorer.Entities.DiExplorerModel",
+        "InstanceType": 0,
+        "InjectablesTypeName": []
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "DiExplorer.Services.DiExplorerService",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "System.Collections.Generic.List`1[DiExplorer.Containers.AbstractContainer]",
+          "DiExplorer.Entities.DiExplorerModel",
+          "DiExplorer.Storages.DependenciesRepository",
+          "DiExplorer.Entities.PlayModeTimer",
+          "DiExplorer.Interfaces.ISerializator"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "DiExplorer.Storages.DependenciesRepository",
+        "InstanceType": 0,
+        "InjectablesTypeName": []
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "DiExplorer.Entities.JsonSerializator",
+        "InstanceType": 0,
+        "InjectablesTypeName": []
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "DiExplorer.Entities.PlayModeTimer",
+        "InstanceType": 0,
+        "InjectablesTypeName": []
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "DiExplorer.Entities.SignalCallsCollector",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "DiExplorer.Services.DiExplorerService"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "DiExplorer.Containers.ProjectContainer",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "DiExplorer.Containers.SceneContainer",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "DiExplorer.Rules.DiExplorerInitializeRule",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "DiExplorer.Services.DiExplorerService",
+          "DiExplorer.Entities.SignalCallsCollector"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "TestEnvironment.Signals.ProjectGreeter",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.SignalDeclarationAsyncInitializer",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "System.Collections.Generic.List`1[Zenject.SignalDeclaration]",
+          "Zenject.LazyInject`1[Zenject.TickableManager]"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "TestEnvironment.Signals.Greeter1",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "TestEnvironment.Signals.Greeter2",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "TestEnvironment.Signals.GameInitializer",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.SignalSubscription+Pool",
+        "InstanceType": 0,
+        "InjectablesTypeName": []
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.SignalCallbackWithLookupWrapper",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "Zenject.SignalBindingBindInfo",
+          "System.Type",
+          "System.Guid",
+          "System.Func`2[System.Object,System.Action`1[System.Object]]",
+          "Zenject.SignalBus",
+          "Zenject.DiContainer"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "TestEnvironment.Services.DebugLogService",
+        "InstanceType": 0,
+        "InjectablesTypeName": []
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.SignalBus",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "System.Collections.Generic.List`1[Zenject.SignalDeclaration]",
+          "Zenject.SignalBus",
+          "Zenject.ZenjectSettings",
+          "Zenject.SignalSubscription+Pool",
+          "Zenject.SignalDeclaration+Factory",
+          "Zenject.DiContainer"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.SignalDeclaration+Factory",
+        "InstanceType": 0,
+        "InjectablesTypeName": []
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.SignalDeclaration",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "Zenject.SignalDeclarationBindInfo",
+          "Zenject.ZenjectSettings"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "Zenject.SignalDeclaration",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "Zenject.SignalDeclarationBindInfo",
+          "Zenject.ZenjectSettings"
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "TestEnvironment.Signals.Greeter3",
+        "InstanceType": 0,
+        "InjectablesTypeName": []
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "TestEnvironment.Signals.Greeter3",
+        "InstanceType": 0,
+        "InjectablesTypeName": []
+      }
+    ],
+    "TestScene1": [
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.TickableManager",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "System.Collections.Generic.List`1[Zenject.ITickable]",
+          "System.Collections.Generic.List`1[Zenject.IFixedTickable]",
+          "System.Collections.Generic.List`1[Zenject.ILateTickable]",
+          "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+          "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+          "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.InitializableManager",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "System.Collections.Generic.List`1[Zenject.IInitializable]",
+          "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.DisposableManager",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "System.Collections.Generic.List`1[System.IDisposable]",
+          "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]",
+          "System.Collections.Generic.List`1[Zenject.ILateDisposable]",
+          "System.Collections.Generic.List`1[ModestTree.Util.ValuePair`2[System.Type,System.Int32]]"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.SignalBus",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "System.Collections.Generic.List`1[Zenject.SignalDeclaration]",
+          "Zenject.SignalBus",
+          "Zenject.ZenjectSettings",
+          "Zenject.SignalSubscription+Pool",
+          "Zenject.SignalDeclaration+Factory",
+          "Zenject.DiContainer"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.SignalDeclarationAsyncInitializer",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "System.Collections.Generic.List`1[Zenject.SignalDeclaration]",
+          "Zenject.LazyInject`1[Zenject.TickableManager]"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.SceneContextRegistryAdderAndRemover",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "Zenject.SceneContext",
+          "Zenject.SceneContextRegistry"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.SceneKernel",
+        "InstanceType": 0,
+        "InjectablesTypeName": []
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Views.TestBindingInstanceComponent",
+        "InstanceType": 1,
+        "InjectablesTypeName": [
+          "TestEnvironment.Services.DebugLogService"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Services.LoadSceneService",
+        "InstanceType": 0,
+        "InjectablesTypeName": []
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Factrories.TestInstanceFactory",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "Zenject.DiContainer"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Models.InformantScene1",
+        "InstanceType": 0,
+        "InjectablesTypeName": []
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "Zenject.SignalDeclaration",
+        "InstanceType": 0,
+        "InjectablesTypeName": [
+          "Zenject.SignalDeclarationBindInfo",
+          "Zenject.ZenjectSettings"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Views.SwitchSceneButton",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "TestEnvironment.Services.DebugLogService",
+          "TestEnvironment.Services.LoadSceneService",
+          "TestEnvironment.Interfaces.IInformant"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Views.SwitchSceneButton",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "TestEnvironment.Services.DebugLogService",
+          "TestEnvironment.Services.LoadSceneService",
+          "TestEnvironment.Interfaces.IInformant"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Views.SwitchSceneButton",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "TestEnvironment.Services.DebugLogService",
+          "TestEnvironment.Services.LoadSceneService",
+          "TestEnvironment.Interfaces.IInformant"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Views.SwitchSceneButton",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "TestEnvironment.Services.DebugLogService",
+          "TestEnvironment.Services.LoadSceneService",
+          "TestEnvironment.Interfaces.IInformant"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Views.InstanceSpawnController",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "TestEnvironment.Factrories.TestInstanceFactory"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Views.InstanceSpawnController",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "TestEnvironment.Factrories.TestInstanceFactory"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Views.TestView",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Signals.Scene1Greeter",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Signals.Scene1FireSignal",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Views.TestView",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Signals.Scene1Greeter",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Signals.Scene1FireSignal",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Views.TestView",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Signals.Scene1Greeter",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Signals.Scene1FireSignal",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Views.TestView",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Signals.Scene1Greeter",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Signals.Scene1FireSignal",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "Zenject.SignalBus"
+        ]
+      },
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Views.TestBindingInstanceComponent",
+        "InstanceType": 2,
+        "InjectablesTypeName": [
+          "TestEnvironment.Services.DebugLogService"
+        ]
+      }
+    ]
+  },
+  "ContainerSignals": {
+    "Project": [
+      {
+        "ParentContextName": "Project",
+        "TypeName": "TestEnvironment.Signals.ProjectContextSignal",
+        "Type": "TestEnvironment.Signals.ProjectContextSignal, DiContainer, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "Subscriptions": [
+          {
+            "ParentContextName": "Project",
+            "TypeName": "TestEnvironment.Signals.ProjectGreeter",
+            "SignalTypeName": "TestEnvironment.Signals.ProjectContextSignal"
+          }
+        ]
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "TestEnvironment.Signals.UserJoinedSignal",
+        "Type": "TestEnvironment.Signals.UserJoinedSignal, DiContainer, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "Subscriptions": [
+          {
+            "ParentContextName": "Project",
+            "TypeName": "TestEnvironment.Signals.Greeter3",
+            "SignalTypeName": "TestEnvironment.Signals.UserJoinedSignal"
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "TestEnvironment.Signals.Greeter1",
+            "SignalTypeName": "TestEnvironment.Signals.UserJoinedSignal"
+          },
+          {
+            "ParentContextName": "Project",
+            "TypeName": "TestEnvironment.Signals.Greeter2",
+            "SignalTypeName": "TestEnvironment.Signals.UserJoinedSignal"
+          }
+        ]
+      }
+    ],
+    "TestScene1": [
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Signals.Scene1ContextSignal",
+        "Type": "TestEnvironment.Signals.Scene1ContextSignal, DiContainer, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "Subscriptions": [
+          {
+            "ParentContextName": "TestScene1",
+            "TypeName": "TestEnvironment.Signals.Scene1Greeter",
+            "SignalTypeName": "TestEnvironment.Signals.Scene1ContextSignal"
+          }
+        ]
+      }
+    ]
+  },
+  "ContainerSubscriptions": {
+    "Project": [
+      {
+        "ParentContextName": "Project",
+        "TypeName": "TestEnvironment.Signals.Greeter3",
+        "SignalTypeName": "TestEnvironment.Signals.UserJoinedSignal"
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "TestEnvironment.Signals.ProjectGreeter",
+        "SignalTypeName": "TestEnvironment.Signals.ProjectContextSignal"
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "TestEnvironment.Signals.Greeter1",
+        "SignalTypeName": "TestEnvironment.Signals.UserJoinedSignal"
+      },
+      {
+        "ParentContextName": "Project",
+        "TypeName": "TestEnvironment.Signals.Greeter2",
+        "SignalTypeName": "TestEnvironment.Signals.UserJoinedSignal"
+      }
+    ],
+    "TestScene1": [
+      {
+        "ParentContextName": "TestScene1",
+        "TypeName": "TestEnvironment.Signals.Scene1Greeter",
+        "SignalTypeName": "TestEnvironment.Signals.Scene1ContextSignal"
+      }
+    ]
+  },
+  "SignalCalls": {
+    "TestEnvironment.Signals.ProjectContextSignal": [
+      {
+        "ParentContextName": "",
+        "SignalTypeName": "TestEnvironment.Signals.ProjectContextSignal",
+        "FiringTime": "00:00:00.0043163"
+      }
+    ],
+    "TestEnvironment.Signals.UserJoinedSignal": [
+      {
+        "ParentContextName": "",
+        "SignalTypeName": "TestEnvironment.Signals.UserJoinedSignal",
+        "FiringTime": "00:00:01.8769119"
+      }
+    ],
+    "TestEnvironment.Signals.Scene1ContextSignal": [
+      {
+        "ParentContextName": "",
+        "SignalTypeName": "TestEnvironment.Signals.Scene1ContextSignal",
+        "FiringTime": "00:00:01.8794424"
+      }
+    ]
+  }
+}
