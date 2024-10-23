@@ -19,20 +19,24 @@ namespace DiContainerDebugger.Editor.Styles
 {
     internal static class EditorElementStyle
     {
+        private static readonly Color HoverColor = new Color(0.42f, 0.78f, 1f);
+        private static readonly Color SelectedColor = new Color(0.24f, 0.49f, 0.91f);
+        
         public static readonly GUIStyle ListElementDefaultStyle = new GUIStyle(GUI.skin.box)
         {
             stretchWidth = true,
             fixedHeight = 20f,
             alignment = TextAnchor.MiddleLeft,
             imagePosition = ImagePosition.ImageLeft,
-            hover = { textColor = new Color(0.42f, 0.78f, 1f) }, // при наведении курсора
-            onNormal = { textColor = new Color(0.24f, 0.49f, 0.91f) }
+            hover = { textColor = HoverColor }, // When hovering over the cursor
+            onNormal = { textColor = SelectedColor },
+            onHover = { textColor = SelectedColor }
         };
         
         public static readonly GUIStyle SelectedListElementStyle = new GUIStyle(ListElementDefaultStyle)
         {
-            normal = { textColor = new Color(0.24f, 0.49f, 0.91f) }, // после нажатия
-            onNormal = { textColor = new Color(0.24f, 0.49f, 0.91f) }
+            hover = { textColor = SelectedColor },
+            normal = { textColor = SelectedColor } // After clicking
         };
 
         public static readonly GUIStyle BindingCountLabel = new GUIStyle(GUI.skin.box)
@@ -46,8 +50,9 @@ namespace DiContainerDebugger.Editor.Styles
             stretchWidth = true,
             fixedHeight = 20f,
             alignment = TextAnchor.MiddleLeft,
-            hover = { textColor = new Color(0.42f, 0.78f, 1f) }, // при наведении курсора
-            onNormal = { textColor = new Color(0.24f, 0.49f, 0.91f) }
+            hover = { textColor = HoverColor },
+            onNormal = { textColor = SelectedColor },
+            onHover = { textColor = SelectedColor }
         };
         
 #if UNITY_2022_3_OR_NEWER

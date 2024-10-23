@@ -13,14 +13,11 @@
 // is strictly forbidden unless prior written permission is obtained
 // from ICVR LLC.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using DiContainerDebugger.Editor.Styles;
 using DiExplorer.Bootstrap;
-using DiExplorer.Data;
 using DiExplorer.Editor.Panels;
-using DiExplorer.Entities;
 using DiExplorer.Services;
 using UnityEditor;
 using UnityEngine;
@@ -28,52 +25,40 @@ using Zenject;
 
 namespace DiContainerDebugger.Editor
 {
-    internal class DiExplorerWindow : ZenjectEditorWindow
+    internal class BindingsWindow : ZenjectEditorWindow
     {
         private const int Unselected = -1;
-        private bool _isShowWindow;
-
-        private Dictionary<string, List<SignalCallData>> _signalCallsDictionary =
-            new Dictionary<string, List<SignalCallData>>();
         
         private List<GUIContent> _relatedItems = new List<GUIContent>();
-        
         private List<GUIContent> _realtimeInstances = new List<GUIContent>();
         private List<GUIContent> _bindings = new List<GUIContent>();
-        private List<GUIContent> _signals = new List<GUIContent>();
-        private List<GUIContent> _subscriptions = new List<GUIContent>();
-
-        private Vector2 _relatedItemsScrollPosition;
         
+        private bool _isShowWindow;
+        private Vector2 _minWindowSize = new Vector2(800, 800);
+        
+        private Vector2 _relatedItemsScrollPosition;
         private Vector2 _realtimeInstancesScrollPosition;
         private Vector2 _bindingsScrollPosition;
-        private Vector2 _signalsScrollPosition;
-        private Vector2 _subscriptionsScrollPosition;
-        private Vector2 _signalCallsScrollPosition;
         
         private int _relatedItemsSelectedIndex = Unselected;
 
         private DiExplorerService _diExplorerService;
         private ContextPanel _bindingsContextPanel;
-        private ContextPanel _signalsContextPanel;
         private BindingsPanel _bindingsPanel;
-        private SignalsPanel _signalsPanel;
 
         [Inject]
-        private void Construct(DiExplorerService service, SignalCallsCollector signalCallsCollector)
+        private void Construct(DiExplorerService service)
         {
             _diExplorerService = service;
             _bindingsContextPanel = new ContextPanel(service);
-            _signalsContextPanel = new ContextPanel(service);
-            _signalsPanel = new SignalsPanel(service, signalCallsCollector);
             _bindingsPanel = new BindingsPanel(service);
         }
 
-        [MenuItem("Custom/DI Explorer")]
+        [MenuItem("Custom/DI Explorer/Bindings")]
 
         public static void ShowWindow()
         {
-            var window = GetWindow<DiExplorerWindow>("DI Explorer");
+            var window = GetWindow<BindingsWindow>("Bindings");
             window.Show();
         }
 
@@ -115,7 +100,6 @@ namespace DiContainerDebugger.Editor
             {
                 case PlayModeStateChange.EnteredPlayMode:
                 {
-                    _signalsPanel.ClearSignalCalls();
                     InjectFromProjectContext();
                     break;
                 }
@@ -126,7 +110,7 @@ namespace DiContainerDebugger.Editor
                 }
                 default:
                 {
-                    Debug.LogWarning($"[{nameof(DiExplorerWindow)}] Undefined state of the editor!");
+                    Debug.LogWarning($"[{nameof(BindingsWindow)}] Undefined state of the editor!");
                     break;
                 }
             }
@@ -145,7 +129,6 @@ namespace DiContainerDebugger.Editor
             }
 
             UpdateBindingsData();
-            UpdateSignalsData();
             CreateContent();
             ProcessItemSelection();
             
@@ -165,62 +148,47 @@ namespace DiContainerDebugger.Editor
                 _bindingsPanel.UpdateDataByContainer(containerName);
             }
         }
-        
-        private void UpdateSignalsData()
-        {
-            _signalsContextPanel.UpdateData();
-                
-            if (_signalsContextPanel.ContextSelectedIndex == 0)
-            {
-                _signalsPanel.UpdateData();
-            }
-            else
-            {
-                var containerName =_signalsContextPanel.ContextSelectedName;
-                _signalsPanel.UpdateDataByContainer(containerName);
-            }
-
-            _signalCallsDictionary = _signalsPanel.SignalCalls;
-        }
 
         private void CreateContent()
         {
             _realtimeInstances = _bindingsPanel.CreateInstancesContent().ToList();
             _bindings = _bindingsPanel.CreateBindingsContent().ToList();
-            _signals = _signalsPanel.CreateSignalsContent().ToList();
         }
 
         private void ProcessItemSelection()
         {
             _relatedItems = _bindingsPanel.ProcessItemSelection().ToList();
-            _subscriptions = _signalsPanel.ProcessItemSelection().ToList();
         }
 
         private void OnGUI()
         {
+            minSize = _minWindowSize;
+            
             EditorGUILayout.BeginHorizontal();
             {
-                OnGUILeftContainer();
-                OnGUIRightContainer();
+                OnGUIContentContainer();
             }
             EditorGUILayout.EndHorizontal();
         }
 
-        private void OnGUILeftContainer()
+        private void OnGUIContentContainer()
         {
-            // Left Main Container
-            EditorGUILayout.BeginVertical(GUILayout.Width(position.width / 2f));
+            EditorGUILayout.BeginVertical();
             {
-                EditorGUILayout.LabelField("Left Container", EditorStyles.boldLabel);
+                //EditorGUILayout.LabelField("Bindings", EditorStyles.boldLabel);
 
+                EditorGUILayout.Separator();
+                
                 // Top Panel
                 EditorGUILayout.BeginHorizontal();
                 {
                     // Dropdown context List
-                    GUILayout.BeginHorizontal(GUILayout.Width(position.width / 6f));
+                    GUILayout.BeginHorizontal(GUILayout.Width(position.width / 5f));
                     {
+                        EditorGUILayout.LabelField("Context", EditorStyles.label, GUILayout.Width(50f));
+                        
                         var newSelectedIndex =
-                            EditorGUILayout.Popup(_bindingsContextPanel.ContextSelectedIndex, _bindingsContextPanel.Contexts);
+                            EditorGUILayout.Popup(_bindingsContextPanel.ContextSelectedIndex, _bindingsContextPanel.Contexts, GUILayout.Width(150f));
                         
                         if (newSelectedIndex != _bindingsContextPanel.ContextSelectedIndex)
                         {
@@ -232,7 +200,7 @@ namespace DiContainerDebugger.Editor
                     GUILayout.FlexibleSpace();
 
                     // Bindings Search String
-                    GUILayout.BeginHorizontal(GUI.skin.FindStyle("Toolbar"), GUILayout.Width(position.width / 4f));
+                    GUILayout.BeginHorizontal(GUI.skin.FindStyle("Toolbar"), GUILayout.Width(position.width / 2f));
                     {
                         _bindingsPanel.SetBindingsSearchString(GUILayout.TextField(_bindingsPanel.BindingsSearchString,
                             EditorElementStyle.ToolbarSearchTextField,
@@ -246,16 +214,19 @@ namespace DiContainerDebugger.Editor
                     GUILayout.EndHorizontal();
                 }
                 EditorGUILayout.EndHorizontal();
+                
+                EditorGUILayout.Separator();
 
                 // Realtime and Bindings Panel
                 EditorGUILayout.BeginHorizontal();
                 {
                     // Realtime Instances Zone
-                    EditorGUILayout.BeginVertical(GUILayout.Width(position.width / 4f));
+                    EditorGUILayout.BeginVertical(GUILayout.Width(position.width / 2f));
                     {
                         EditorGUILayout.LabelField("Realtime Instances", EditorStyles.boldLabel);
                         _realtimeInstancesScrollPosition =
-                            EditorGUILayout.BeginScrollView(_realtimeInstancesScrollPosition, GUILayout.Height(200f));
+                            EditorGUILayout.BeginScrollView(_realtimeInstancesScrollPosition,
+                                GUILayout.Height(position.height / 2));
                         {
                             _bindingsPanel.SetRealtimeSelectedIndex(GUILayout.SelectionGrid(
                                 _bindingsPanel.RealtimeSelectedIndex, _realtimeInstances.ToArray(), 1,
@@ -273,17 +244,17 @@ namespace DiContainerDebugger.Editor
                     EditorGUILayout.EndVertical();
 
                     // Bindings zone
-                    EditorGUILayout.BeginVertical(GUILayout.Width(position.width / 4f));
+                    EditorGUILayout.BeginVertical(GUILayout.Width(position.width / 2f));
                     {
                         EditorGUILayout.LabelField("Bindings", EditorStyles.boldLabel);
-                        _bindingsScrollPosition =
-                            EditorGUILayout.BeginScrollView(_bindingsScrollPosition, GUILayout.Height(200f));
+                        _bindingsScrollPosition = EditorGUILayout.BeginScrollView(_bindingsScrollPosition,
+                            GUILayout.Height(position.height / 2));
                         {
                             for (var i = 0; i < _bindings.Count; i++)
                             {
                                 GUILayout.BeginHorizontal();
                                 {
-                                    GUIStyle style = _bindingsPanel.BindingSelectedIndex == i
+                                    var style = _bindingsPanel.BindingSelectedIndex == i
                                         ? EditorElementStyle.SelectedListElementStyle
                                         : EditorElementStyle.ListElementDefaultStyle;
 
@@ -319,9 +290,10 @@ namespace DiContainerDebugger.Editor
                 // Related Items
                 EditorGUILayout.BeginVertical();
                 {
+                    GUILayout.FlexibleSpace();
                     EditorGUILayout.LabelField("Related items", EditorStyles.boldLabel);
                     _relatedItemsScrollPosition =
-                        EditorGUILayout.BeginScrollView(_relatedItemsScrollPosition, GUILayout.Height(200f));
+                        EditorGUILayout.BeginScrollView(_relatedItemsScrollPosition);
                     {
                         _relatedItemsSelectedIndex = GUILayout.SelectionGrid(_relatedItemsSelectedIndex,
                             _relatedItems.ToArray(), 1, EditorElementStyle.ListElementDefaultStyle);
@@ -334,142 +306,6 @@ namespace DiContainerDebugger.Editor
             EditorGUILayout.EndVertical();
                 
             EditorGUILayout.Separator();
-        }
-        
-        private void OnGUIRightContainer()
-        {
-            // Right Main Container
-            EditorGUILayout.BeginVertical(GUILayout.Width(position.width / 2f));
-            {
-                EditorGUILayout.LabelField("Right Container", EditorStyles.boldLabel);
-                
-                // Top Panel
-                EditorGUILayout.BeginHorizontal();
-                {
-                    // Dropdown context List
-                    GUILayout.BeginHorizontal(GUILayout.Width(position.width / 6f));
-                    {
-                        var newSelectedIndex =
-                            EditorGUILayout.Popup(_signalsContextPanel.ContextSelectedIndex, _signalsContextPanel.Contexts);
-
-                        if (newSelectedIndex != _signalsContextPanel.ContextSelectedIndex)
-                        {
-                            _signalsContextPanel.SetSelectedIndex(newSelectedIndex);
-                        }
-                    }
-                    GUILayout.EndHorizontal();
-
-                    GUILayout.FlexibleSpace();
-
-                    // Subscriptions Search String
-                    GUILayout.BeginHorizontal(GUI.skin.FindStyle("Toolbar"), GUILayout.Width(position.width / 4f));
-                    {
-                        _signalsPanel.SetSearchString(GUILayout.TextField(_signalsPanel.SubscriptionsSearchString,
-                            EditorElementStyle.ToolbarSearchTextField,
-                            GUILayout.ExpandWidth(true)));
-                        if (GUILayout.Button("", EditorElementStyle.ToolbarSearchCancelButton))
-                        {
-                            _signalsPanel.SetSearchString(string.Empty);
-                            GUI.FocusControl(null);
-                        }
-                    }
-                    GUILayout.EndHorizontal();
-                }
-                GUILayout.EndHorizontal();
-                    
-                // Signals and Subscriptions panel
-                EditorGUILayout.BeginHorizontal(GUILayout.Width(position.width / 2f));
-                {
-                    // Signals
-                    EditorGUILayout.BeginVertical(GUILayout.Width(position.width / 4f));
-                    {
-                        EditorGUILayout.LabelField("Signals", EditorStyles.boldLabel);
-                        
-                        _signalsScrollPosition =
-                            EditorGUILayout.BeginScrollView(_signalsScrollPosition, GUILayout.Height(220f));
-                        {
-                            for (int i = 0; i < _signals.Count; i++)
-                            {
-                                var s = _signalsPanel.GetSignalToggleValue(i);
-                                _signalsPanel.SetSignalToggleValue(i,
-                                    GUILayout.Toggle(_signalsPanel.GetSignalToggleValue(i), _signals[i],
-                                        EditorElementStyle.ToggleDefaultStyle));
-                            }
-                        }
-                        EditorGUILayout.EndScrollView();
-                    } 
-                    EditorGUILayout.EndVertical();
-                        
-                    // Subscriptions
-                    EditorGUILayout.BeginVertical(GUILayout.Width(position.width / 4f));
-                    {
-                        EditorGUILayout.LabelField("Subscriptions", EditorStyles.boldLabel);
-
-                        _subscriptionsScrollPosition =
-                            EditorGUILayout.BeginScrollView(_subscriptionsScrollPosition, GUILayout.Height(200f));
-                        {
-                            for (var i = 0; i < _subscriptions.Count; i++)
-                            {
-                                GUILayout.BeginHorizontal();
-                                {
-                                    GUIStyle style = _signalsPanel.SubscriptionsSelectedIndex == i
-                                        ? EditorElementStyle.SelectedListElementStyle
-                                        : EditorElementStyle.ListElementDefaultStyle;
-
-                                    if (GUILayout.Button(new GUIContent(_subscriptions[i]), style))
-                                    {
-                                        _signalsPanel.SetSelectedSubscriptionIndex(i);
-                                    }
-                                }
-                                GUILayout.EndHorizontal();
-                            }
-                        }
-                        EditorGUILayout.EndScrollView();
-                    }
-                    EditorGUILayout.EndVertical();
-                }
-                EditorGUILayout.EndHorizontal();
-                
-                EditorGUILayout.Separator();
-
-                // Signal Calls
-                EditorGUILayout.BeginVertical();
-                {
-                    EditorGUILayout.LabelField("Signal Calls", EditorStyles.boldLabel);
-                    
-                    _signalCallsScrollPosition = EditorGUILayout.BeginScrollView(_signalCallsScrollPosition);
-                    {
-                        GUILayout.BeginHorizontal();
-
-                        if (_signalCallsDictionary.Keys.Count > 0)
-                        {
-                            foreach (var callTime in _signalCallsDictionary.Keys)
-                            {
-                                GUILayout.BeginVertical(GUILayout.Width(100));
-                                {
-                                    var timeSpan = TimeSpan.Parse(callTime);
-                                    var formattedTime = $@"{timeSpan:mm\:ss\.fff}";
-
-                                    GUILayout.Label(formattedTime, GUILayout.Height(20));
-
-                                    foreach (var signalCallData in _signalCallsDictionary[callTime])
-                                    {
-                                        if (GUILayout.Button(signalCallData.SignalTypeName, GUILayout.Height(20)))
-                                        {
-                                            Debug.Log(signalCallData.SignalTypeName + " clicked");
-                                        }
-                                    }
-                                }
-                                GUILayout.EndVertical();
-                            }
-                        }
-                        GUILayout.EndHorizontal();
-                    }
-                    EditorGUILayout.EndScrollView();
-                }
-                EditorGUILayout.EndVertical();
-            }
-            EditorGUILayout.EndVertical();
         }
     }
 }

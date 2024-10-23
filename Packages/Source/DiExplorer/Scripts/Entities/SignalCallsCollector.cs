@@ -106,7 +106,7 @@ namespace DiExplorer.Entities
             var timeSpan = _diExplorerService.GetElapsedTimePlayModeTimer();
             var signalCallData = new SignalCallData("", signalTypeName, timeSpan);
             
-            DictionaryExtension.AddData(_signalCalls, timeSpan.ToString(), signalCallData);
+            DictionaryExtension.AddData(_signalCalls, signalTypeName, signalCallData);
 
             var savedCalls = _signalCalls.ToDictionary(
                 kvp => kvp.Key,
