@@ -18,6 +18,7 @@ using System.Linq;
 using DiContainerDebugger.Editor.Styles;
 using DiExplorer.Bootstrap;
 using DiExplorer.Editor.Panels;
+using DiExplorer.Entities;
 using DiExplorer.Services;
 using UnityEditor;
 using UnityEngine;
@@ -41,17 +42,22 @@ namespace DiContainerDebugger.Editor
         private Vector2 _bindingsScrollPosition;
         
         private int _relatedItemsSelectedIndex = Unselected;
+        
+        private GUIContent _passedIcon;
+        private GUIContent _errorIcon;
 
         private DiExplorerService _diExplorerService;
         private ContextPanel _bindingsContextPanel;
         private BindingsPanel _bindingsPanel;
+        private StaticAnalyzer _staticAnalyzer;
 
         [Inject]
-        private void Construct(DiExplorerService service)
+        private void Construct(DiExplorerService service, StaticAnalyzer staticAnalyzer)
         {
             _diExplorerService = service;
             _bindingsContextPanel = new ContextPanel(service);
             _bindingsPanel = new BindingsPanel(service);
+            _staticAnalyzer = staticAnalyzer;
         }
 
         [MenuItem("Custom/DI Explorer/Bindings")]
@@ -79,6 +85,9 @@ namespace DiContainerDebugger.Editor
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
             EditorApplication.update += Repaint;
             EditorApplication.update += OnUpdate;
+            
+            _passedIcon = EditorGUIUtility.IconContent("TestPassed");
+            _errorIcon = EditorGUIUtility.IconContent("console.erroricon");
         }
 
         private void OnDisable()
@@ -193,6 +202,21 @@ namespace DiContainerDebugger.Editor
                         if (newSelectedIndex != _bindingsContextPanel.ContextSelectedIndex)
                         {
                             _bindingsContextPanel.SetSelectedIndex(newSelectedIndex);
+                        }
+                        
+                        GUILayout.Space(5f);
+
+                        if (!EditorApplication.isPlaying && _isShowWindow)
+                        {
+                            var signalBusStatusIcon = _staticAnalyzer.IsBoundSignalBus ? _passedIcon : _errorIcon;
+
+                            GUILayout.Label("Bind status", GUILayout.Width(70f));
+                            GUILayout.Label(signalBusStatusIcon, GUILayout.Width(20f), GUILayout.Height(20f));
+
+                            if (GUILayout.Button("Validate", GUILayout.Width(60f)))
+                            {
+                                _staticAnalyzer.ValidateActiveScenes();
+                            }
                         }
                     }
                     GUILayout.EndHorizontal();
