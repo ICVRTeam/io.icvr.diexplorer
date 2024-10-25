@@ -13,19 +13,26 @@
 // is strictly forbidden unless prior written permission is obtained
 // from ICVR LLC.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using DiContainerDebugger.Editor;
 using DiContainerDebugger.Scripts;
 using DiExplorer.Data;
 using DiExplorer.Extensions;
 using DiExplorer.Services;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace DiExplorer.Editor.Panels
 {
     internal class BindingsPanel
     {
         private const int Unselected = -1;
+        private const string NoMonoIconName = "d_ScriptableObject Icon";
+        private const string DynamicMonoIconName = "d_Prefab Icon";
+        private const string SceneMonoIconName = "d_TerrainInspector.TerrainToolRaise";
 
         private BindingData[] _bindingsData;
         private InstanceData[] _instancesData;
@@ -73,23 +80,23 @@ namespace DiExplorer.Editor.Panels
             
             foreach (var instanceData in _instancesData)
             {
-                var icon = EditorGUIUtility.IconContent("Prefab Icon").image;
+                var icon = EditorGUIUtility.IconContent(DynamicMonoIconName).image;
                 
                 switch (instanceData.InstanceType)
                 {
                     case InstanceType.NoMono:
                     {
-                        icon = EditorGUIUtility.IconContent("d_ScriptableObject Icon").image;
+                        icon = EditorGUIUtility.IconContent(NoMonoIconName).image;
                         break;
                     }
                     case InstanceType.DynamicMono:
                     {
-                        icon = EditorGUIUtility.IconContent("Prefab Icon").image;
+                        icon = EditorGUIUtility.IconContent(DynamicMonoIconName).image;
                         break;
                     }
                     case InstanceType.SceneMono:
                     {
-                        icon = EditorGUIUtility.IconContent("TerrainInspector.TerrainToolRaise").image;
+                        icon = EditorGUIUtility.IconContent(SceneMonoIconName).image;
                         break;
                     }
                 }
@@ -186,6 +193,112 @@ namespace DiExplorer.Editor.Panels
                 _realtimeSelectedIndex = Unselected;
                 _prevRealtimeSelectedIndex = Unselected;
             }
+        }
+
+        public void ShowContextMenu(int itemIndex)
+        {
+            var menu = new GenericMenu();
+
+            var iconName = _realtimeInstances[itemIndex].image.name;
+            
+            menu.AddItem(new GUIContent("Show in Project"), false, () => ShowInProject(itemIndex));
+            
+            if (iconName == DynamicMonoIconName || iconName == SceneMonoIconName)
+            {
+                menu.AddItem(new GUIContent("Show in Hierarchy"), false, () => ShowInHierarchy(itemIndex));
+            }
+            
+            menu.ShowAsContext();
+        }
+
+        private void ShowInProject(int index)
+        {
+            Debug.Log("Project " + _realtimeInstances[index].text);
+            
+            var instanceTypeName = _realtimeInstances[index].text;
+            var pattern = "[^.]+$";
+
+            var match = RegexExtension.FindMatch(pattern, instanceTypeName);
+            
+            if (!match.Success)
+            {
+                Debug.LogWarning($"[{nameof(BindingsWindow)}] {_realtimeInstances[index].text} Not found from Project!");
+                return;
+            }
+            
+            var guids = AssetDatabase.FindAssets($"{match.Value} t:Script");
+
+            if (guids.Length > 0)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guids.First());
+                var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
+
+                if (asset != null)
+                {
+                    EditorGUIUtility.PingObject(asset);
+                }
+                else
+                {
+                    Debug.LogWarning($"[{nameof(BindingsWindow)}] {_realtimeInstances[index].text} Asset not found! ");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[{nameof(BindingsWindow)}] {_realtimeInstances[index].text} No objects of this type were found in the project!");
+            }
+        }
+
+        private void ShowInHierarchy(int index)
+        {
+            var instanceTypeName = _realtimeInstances[index].text;
+            var pattern = "[^.]+$";
+
+            var match = RegexExtension.FindMatch(pattern, instanceTypeName);
+            
+            if (!match.Success)
+            {
+                Debug.LogWarning($"[{nameof(BindingsWindow)}] {_realtimeInstances[index].text} Not found from Project!");
+                return;
+            }
+            
+            var type = FindTypeByName(instanceTypeName);
+        
+            if (type == null || !typeof(Component).IsAssignableFrom(type))
+            {
+                Debug.LogError($"[{nameof(BindingsWindow)}] {_realtimeInstances[index].text} Type not found or not a Component!");
+                return;
+            }
+            
+            var components = Object.FindObjectsOfType(type) as Component[];
+
+            if (components != null && components.Length > 0)
+            {
+                var gameObjects = components.Select(component => component.gameObject).ToArray();
+
+                Selection.objects = gameObjects; // select object
+            }
+            else
+            {
+                Debug.LogWarning($"[{nameof(BindingsWindow)}] {_realtimeInstances[index].text} Object not found in the scene!");
+            }
+        }
+        
+        private static Type FindTypeByName(string typeName)
+        {
+            // Find type in the uploaded assemblies
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            
+            foreach (var assembly in assemblies)
+            {
+                var type = assembly.GetType(typeName);
+                
+                if (type != null)
+                {
+                    return type;
+                }
+            }
+            
+            return null;
         }
     }
 }
