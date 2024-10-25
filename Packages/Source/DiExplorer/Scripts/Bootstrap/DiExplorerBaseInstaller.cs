@@ -33,6 +33,7 @@ namespace DiExplorer.Scripts.Bootstrap
 
             Container.Bind<PlayModeTimer>().AsSingle();
             Container.Bind<SignalCallsCollector>().AsSingle();
+            Container.Bind<StaticAnalyzer>().AsSingle();
         }
     }
 }

@@ -64,18 +64,25 @@ namespace DiContainerDebugger.Editor
         private bool _autoScroll = true;
         private bool _forceAutoScroll;
         
+        private GUIContent _passedIcon;
+        private GUIContent _errorIcon;
         private GUIContent _scaleIcon;
 
         private DiExplorerService _diExplorerService;
         private ContextPanel _signalsContextPanel;
         private SignalsPanel _signalsPanel;
+        private StaticAnalyzer _staticAnalyzer;
 
         [Inject]
-        private void Construct(DiExplorerService service, SignalCallsCollector signalCallsCollector)
+        private void Construct(
+            DiExplorerService service, 
+            SignalCallsCollector signalCallsCollector, 
+            StaticAnalyzer staticAnalyzer)
         {
             _diExplorerService = service;
             _signalsContextPanel = new ContextPanel(service);
             _signalsPanel = new SignalsPanel(service, signalCallsCollector);
+            _staticAnalyzer = staticAnalyzer;
         }
 
         [MenuItem("Custom/DI Explorer/Signals")]
@@ -103,6 +110,8 @@ namespace DiContainerDebugger.Editor
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
             EditorApplication.update += OnUpdate;
             
+            _passedIcon = EditorGUIUtility.IconContent("TestPassed");
+            _errorIcon = EditorGUIUtility.IconContent("console.erroricon");
             _scaleIcon = EditorGUIUtility.IconContent("d_ViewToolZoom");
         }
 
@@ -230,7 +239,7 @@ namespace DiContainerDebugger.Editor
                     // Dropdown context List
                     GUILayout.BeginHorizontal(GUILayout.Width(position.width / 5f));
                     {
-                        EditorGUILayout.LabelField("Context", EditorStyles.label, GUILayout.Width(50f));
+                        GUILayout.Label("Context", GUILayout.Width(50f));
 
                         var newSelectedIndex =
                             EditorGUILayout.Popup(_signalsContextPanel.ContextSelectedIndex,
@@ -239,6 +248,21 @@ namespace DiContainerDebugger.Editor
                         if (newSelectedIndex != _signalsContextPanel.ContextSelectedIndex)
                         {
                             _signalsContextPanel.SetSelectedIndex(newSelectedIndex);
+                        }
+                        
+                        GUILayout.Space(5f);
+
+                        if (!EditorApplication.isPlaying && _isShowWindow)
+                        {
+                            var signalBusStatusIcon = _staticAnalyzer.IsBoundSignalBus ? _passedIcon : _errorIcon;
+
+                            GUILayout.Label("SignalBus", GUILayout.Width(65f));
+                            GUILayout.Label(signalBusStatusIcon, GUILayout.Width(20f), GUILayout.Height(20f));
+
+                            if (GUILayout.Button("Validate", GUILayout.Width(60f)))
+                            {
+                                _staticAnalyzer.ValidateActiveScenes();
+                            }
                         }
                     }
                     GUILayout.EndHorizontal();

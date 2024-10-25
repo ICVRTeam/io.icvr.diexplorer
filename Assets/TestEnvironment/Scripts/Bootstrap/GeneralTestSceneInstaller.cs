@@ -27,9 +27,13 @@ namespace TestEnvironment.Bootstrap
         
         public override void InstallBindings()
         {
-            Container.Bind<TestBindingInstanceComponent>().FromNewComponentOnNewGameObject().WithGameObjectName("Object bind in installer").AsSingle().NonLazy();
+            Container.Bind<TestBindingInstanceComponent>()
+                .FromNewComponentOnNewGameObject().WithGameObjectName("Object bind in installer").AsSingle().NonLazy();
+            
             Container.Bind<LoadSceneService>().AsSingle();
-            Container.BindFactory<TestFactoryInstance, TestFactoryInstance, TestInstanceFactory>();
+            
+            Container.BindFactory<TestFactoryInstance, TestFactoryInstance, TestInstanceFactory>()
+                .FromFactory<PrefabFactory<TestFactoryInstance>>();
         }
     }
 }
