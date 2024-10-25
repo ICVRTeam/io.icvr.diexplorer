@@ -20,16 +20,6 @@ namespace TestEnvironment.Factrories
 {
     public class TestInstanceFactory : PlaceholderFactory<TestFactoryInstance, TestFactoryInstance>
     {
-        private readonly DiContainer _diContainer;
-
-        public TestInstanceFactory(DiContainer diContainer)
-        {
-            _diContainer = diContainer;
-        }
-        public override TestFactoryInstance Create(TestFactoryInstance instance)
-        {
-            var view = _diContainer.InstantiatePrefabForComponent<TestFactoryInstance>(instance);
-            return view;
-        }
+        
     }
 }
