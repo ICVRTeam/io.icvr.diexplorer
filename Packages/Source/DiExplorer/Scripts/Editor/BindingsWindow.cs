@@ -228,16 +228,15 @@ namespace DiContainerDebugger.Editor
                             EditorGUILayout.BeginScrollView(_realtimeInstancesScrollPosition,
                                 GUILayout.Height(position.height / 2));
                         {
-                            _bindingsPanel.SetRealtimeSelectedIndex(GUILayout.SelectionGrid(
-                                _bindingsPanel.RealtimeSelectedIndex, _realtimeInstances.ToArray(), 1,
-                                EditorElementStyle.ListElementDefaultStyle));
-
-                            if (_bindingsPanel.RealtimeSelectedIndex != _bindingsPanel.PrevRealtimeSelectedIndex)
+                            for (var i = 0; i < _realtimeInstances.Count; i++)
                             {
-                                _relatedItemsSelectedIndex = Unselected;
+                                // Используем кнопку для каждого элемента в списке
+                                if (GUILayout.Button(_realtimeInstances[i], EditorElementStyle.ListElementDefaultStyle))
+                                {
+                                    // Обработка нажатия на элемент
+                                    HandleRealtimeInstanceClick(i);
+                                }
                             }
-
-                            _bindingsPanel.ResetSelectedIndexExceptInstances();
                         }
                         EditorGUILayout.EndScrollView();
                     }
@@ -307,5 +306,26 @@ namespace DiContainerDebugger.Editor
                 
             EditorGUILayout.Separator();
         }
+        
+        private void HandleRealtimeInstanceClick(int index)
+        {
+            if (Event.current.button == 0) // Left mouse button
+            {
+                _bindingsPanel.SetRealtimeSelectedIndex(index);
+                
+                if (_bindingsPanel.RealtimeSelectedIndex != _bindingsPanel.PrevRealtimeSelectedIndex)
+                {
+                    _relatedItemsSelectedIndex = Unselected;
+                }
+
+                _bindingsPanel.ResetSelectedIndexExceptInstances();
+            }
+            else if (Event.current.button == 1) // Right mouse button
+            {
+                _bindingsPanel.ShowContextMenu(index);
+            }
+        }
+        
+       
     }
 }
