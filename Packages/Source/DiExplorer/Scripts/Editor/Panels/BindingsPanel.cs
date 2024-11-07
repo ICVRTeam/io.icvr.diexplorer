@@ -29,10 +29,20 @@ namespace DiExplorer.Editor.Panels
 {
     internal class BindingsPanel
     {
+        public enum SearchGroup
+        {
+            Bindings = 0,
+            Instances = 1
+        }
+        
         private const int Unselected = -1;
+        private const int CharacterLength = 6;
         private const string NoMonoIconName = "d_ScriptableObject Icon";
         private const string DynamicMonoIconName = "d_Prefab Icon";
         private const string SceneMonoIconName = "d_TerrainInspector.TerrainToolRaise";
+        private const string GameObjectIconName = "GameObject Icon";
+        private const string BoxColliderIconName = "BoxCollider Icon";
+        private const string AnimatorControllerIconName = "AnimatorController Icon";
 
         private BindingData[] _bindingsData;
         private InstanceData[] _instancesData;
@@ -40,21 +50,18 @@ namespace DiExplorer.Editor.Panels
         private List<GUIContent> _bindings = new List<GUIContent>();
         private List<GUIContent> _realtimeInstances = new List<GUIContent>();
 
-        private int _bindingSelectedIndex = Unselected;
-        private int _prevBindingSelectedIndex = Unselected;
-        private int _realtimeSelectedIndex = Unselected;
-        private int _prevRealtimeSelectedIndex = Unselected;
-
-        private string _bindingsSearchString = string.Empty;
-        private string _prevBindingsSearchString = "string.Empty";
+        private SearchGroup _searchGroup;
+        private string _prevSearchString = "string.Empty";
         
         private DiExplorerService _diExplorerService;
         
-        public int BindingSelectedIndex => _bindingSelectedIndex;
-        public int PrevBindingSelectedIndex => _prevBindingSelectedIndex;
-        public int RealtimeSelectedIndex => _realtimeSelectedIndex;
-        public int PrevRealtimeSelectedIndex => _prevRealtimeSelectedIndex;
-        public string BindingsSearchString => _bindingsSearchString;
+        public int BindingSelectedIndex { get; private set; } = Unselected;
+        public int PrevBindingSelectedIndex { get; private set; } = Unselected;
+        public int RealtimeSelectedIndex { get; private set; } = Unselected;
+        public int PrevRealtimeSelectedIndex { get; private set; } = Unselected;
+        public int RelatedItemSelectedIndex { get; private set; } = Unselected;
+        public string SearchString { get; private set; } = string.Empty;
+        public string SelectedItemForRelated { get; private set; }
 
 
         public BindingsPanel(DiExplorerService diExplorerService)
@@ -74,9 +81,15 @@ namespace DiExplorer.Editor.Panels
             _instancesData = _diExplorerService.GetInstances(containerName);
         }
 
-        public IEnumerable<GUIContent> CreateInstancesContent()
+        public IEnumerable<GUIContent> CreateInstancesContent(Rect position)
         {
             _realtimeInstances.Clear();
+            
+            if (SearchString != _prevSearchString)
+            {
+                _prevSearchString = SearchString;
+                BindingSelectedIndex = Unselected;
+            }
             
             foreach (var instanceData in _instancesData)
             {
@@ -101,128 +114,192 @@ namespace DiExplorer.Editor.Panels
                     }
                 }
                 
-                _realtimeInstances.Add(new GUIContent(instanceData.TypeName, icon));
+                var maxTextLength = (int)Mathf.Round(position.width / 2f - 160f);
+                var instanceTypeName = CutString(instanceData.TypeName, maxTextLength);
+                
+                var pattern = SearchString;
+                
+                if (_searchGroup == SearchGroup.Instances)
+                {
+                    if (RegexExtension.IsContainMatch(pattern, instanceData.TypeName))
+                    {
+                        _realtimeInstances.Add(new GUIContent(instanceTypeName, icon, instanceData.TypeName));
+                    }
+                }
+                else
+                {
+                    _realtimeInstances.Add(new GUIContent(instanceTypeName, icon, instanceData.TypeName));
+                }
             }
 
             return _realtimeInstances;
         }
 
-        public IEnumerable<GUIContent> CreateBindingsContent()
+        public IEnumerable<GUIContent> CreateBindingsContent(Rect position)
         {
             _bindings.Clear();
             
-            if (_bindingsSearchString != _prevBindingsSearchString)
+            if (SearchString != _prevSearchString)
             {
-                _prevBindingsSearchString = _bindingsSearchString;
-                _bindingSelectedIndex = Unselected;
+                _prevSearchString = SearchString;
+                BindingSelectedIndex = Unselected;
             }
             
             foreach (var bindingData in _bindingsData)
             {
-                var pattern = _bindingsSearchString;
-                if (RegexExtension.IsContainMatch(pattern, bindingData.TypeName))
+                var maxTextLength = (int)Mathf.Round(position.width / 2f - 220f);
+                var bindingTypeName = CutString(bindingData.TypeName, maxTextLength);
+                var pattern = SearchString;
+                
+                if (_searchGroup == SearchGroup.Bindings)
                 {
-                    _bindings.Add(new GUIContent(bindingData.TypeName));
+                    if (RegexExtension.IsContainMatch(pattern, bindingData.TypeName))
+                    {
+                        _bindings.Add(new GUIContent(bindingTypeName, bindingData.TypeName));
+                    }
+                }
+                else
+                {
+                    _bindings.Add(new GUIContent(bindingTypeName, bindingData.TypeName));
                 }
             }
 
             return _bindings;
         }
         
-        public IEnumerable<GUIContent> ProcessItemSelection()
+        public IEnumerable<GUIContent> ProcessItemSelection(Rect position)
         {
             var relatedItems = new List<GUIContent>();
             
-            if (_realtimeSelectedIndex != Unselected && _realtimeSelectedIndex < _realtimeInstances.Count)
+            if (RealtimeSelectedIndex != Unselected && RealtimeSelectedIndex < _realtimeInstances.Count)
             {
-                var selectedInstanceTypeName = _realtimeInstances[_realtimeSelectedIndex].text;
+                var selectedInstanceTypeName = _realtimeInstances[RealtimeSelectedIndex].tooltip;
                 var injectablesName = _diExplorerService.GetInjectableNamesFromInstance(selectedInstanceTypeName);
+                var icon = EditorGUIUtility.IconContent(BoxColliderIconName).image;
+                
+                SelectedItemForRelated = selectedInstanceTypeName;
                 
                 foreach (var injectable in injectablesName)
                 {
-                    relatedItems.Add(new GUIContent(injectable));
+                    var maxTextLength = (int)Mathf.Round(position.width - 240f);
+                    var injectableName = CutString(injectable, maxTextLength);
+                    
+                    relatedItems.Add(new GUIContent(injectableName, icon, injectable));
                 }
                 
+                AddInheritorsToContent(selectedInstanceTypeName, relatedItems, position);
+
                 return relatedItems;
             }
             
-            if (_bindingSelectedIndex != Unselected && _bindingSelectedIndex < _bindings.Count)
+            if (BindingSelectedIndex != Unselected && BindingSelectedIndex < _bindings.Count)
             {
-                var selectedBindingName = _bindings[_bindingSelectedIndex].text;
+                var selectedBindingName = _bindings[BindingSelectedIndex].tooltip;
                 var instancesName = _diExplorerService.GetInstanceNamesFromBinding(selectedBindingName);
+                var icon = EditorGUIUtility.IconContent(GameObjectIconName).image;
+
+                SelectedItemForRelated = selectedBindingName;
 
                 foreach (var instance in instancesName)
                 {
-                    relatedItems.Add(new GUIContent(instance));
+                    var maxTextLength = (int)Mathf.Round(position.width - 240f);
+                    var instanceName = CutString(instance, maxTextLength);
+                    
+                    relatedItems.Add(new GUIContent(instanceName, icon, instance));
                 }
+                
+                AddInheritorsToContent(selectedBindingName, relatedItems, position);
             }
 
             return relatedItems;
         }
 
-        public void SetBindingsSearchString(string value)
+        public void SetSearchString(string value, SearchGroup searchGroup)
         {
-            _bindingsSearchString = value;
+            SearchString = value;
+            _searchGroup = searchGroup;
         }
-        
+
         public void SetRealtimeSelectedIndex(int index)
         {
-            _realtimeSelectedIndex = index;
+            RealtimeSelectedIndex = index;
         }
 
         public void SetBindingSelectedIndex(int index)
         {
-            _bindingSelectedIndex = index;
+            BindingSelectedIndex = index;
+        }
+
+        public void SetRelatedItemSelectedIndex(int index)
+        {
+            RelatedItemSelectedIndex = index;
         }
 
         public void ResetSelectedIndexExceptInstances()
         {
-            if (_realtimeSelectedIndex != _prevRealtimeSelectedIndex)
+            if (RealtimeSelectedIndex != PrevRealtimeSelectedIndex)
             {
-                _prevRealtimeSelectedIndex = _realtimeSelectedIndex;
-                _bindingSelectedIndex = Unselected;
-                _prevBindingSelectedIndex = Unselected;
-            }
-        }
-        
-        public void ResetSelectedIndexExceptBindings()
-        {
-            if (_bindingSelectedIndex != _prevBindingSelectedIndex)
-            {
-                _prevBindingSelectedIndex = _bindingSelectedIndex;
-                _realtimeSelectedIndex = Unselected;
-                _prevRealtimeSelectedIndex = Unselected;
+                PrevRealtimeSelectedIndex = RealtimeSelectedIndex;
+                BindingSelectedIndex = Unselected;
+                PrevBindingSelectedIndex = Unselected;
+                ResetRelatedSelectedIndex();
             }
         }
 
-        public void ShowContextMenu(int itemIndex)
+        public void ResetSelectedIndexExceptBindings()
+        {
+            if (BindingSelectedIndex != PrevBindingSelectedIndex)
+            {
+                PrevBindingSelectedIndex = BindingSelectedIndex;
+                RealtimeSelectedIndex = Unselected;
+                PrevRealtimeSelectedIndex = Unselected;
+                ResetRelatedSelectedIndex();
+            }
+        }
+
+        public void ResetRelatedSelectedIndex()
+        {
+            RelatedItemSelectedIndex = Unselected;
+        }
+
+        public void ShowInstanceContextMenu(IReadOnlyList<GUIContent> content, int itemIndex)
         {
             var menu = new GenericMenu();
 
-            var iconName = _realtimeInstances[itemIndex].image.name;
+            var iconName = content[itemIndex].image.name;
             
-            menu.AddItem(new GUIContent("Show in Project"), false, () => ShowInProject(itemIndex));
+            menu.AddItem(new GUIContent("Show in Project"), false, () => ShowInProject(content, itemIndex));
             
             if (iconName == DynamicMonoIconName || iconName == SceneMonoIconName)
             {
-                menu.AddItem(new GUIContent("Show in Hierarchy"), false, () => ShowInHierarchy(itemIndex));
+                menu.AddItem(new GUIContent("Show in Hierarchy"), false, () => ShowInHierarchy(content, itemIndex));
             }
             
             menu.ShowAsContext();
         }
 
-        private void ShowInProject(int index)
+        public void ShowRelatedItemContextMenu(IReadOnlyList<GUIContent> content, int itemIndex)
         {
-            Debug.Log("Project " + _realtimeInstances[index].text);
+            var menu = new GenericMenu();
+
+            menu.AddItem(new GUIContent("Show in Project"), false, () => ShowInProject(content, itemIndex));
+            menu.AddItem(new GUIContent("Show in Hierarchy"), false, () => ShowInHierarchy(content, itemIndex));
+
+            menu.ShowAsContext();
+        }
+
+        public void ShowInProject(IReadOnlyList<GUIContent> content, int index)
+        {
+            Debug.Log("Project " + content[index].text);
             
-            var instanceTypeName = _realtimeInstances[index].text;
+            var instanceTypeName = content[index].text;
             var pattern = "[^.]+$";
 
             var match = RegexExtension.FindMatch(pattern, instanceTypeName);
             
             if (!match.Success)
             {
-                Debug.LogWarning($"[{nameof(BindingsWindow)}] {_realtimeInstances[index].text} Not found from Project!");
+                Debug.LogWarning($"[{nameof(BindingsWindow)}] {content[index].text} Not found from Project!");
                 return;
             }
             
@@ -239,25 +316,25 @@ namespace DiExplorer.Editor.Panels
                 }
                 else
                 {
-                    Debug.LogWarning($"[{nameof(BindingsWindow)}] {_realtimeInstances[index].text} Asset not found! ");
+                    Debug.LogWarning($"[{nameof(BindingsWindow)}] {content[index].text} Asset not found! ");
                 }
             }
             else
             {
-                Debug.LogWarning($"[{nameof(BindingsWindow)}] {_realtimeInstances[index].text} No objects of this type were found in the project!");
+                Debug.LogWarning($"[{nameof(BindingsWindow)}] {content[index].text} No objects of this type were found in the project!");
             }
         }
 
-        private void ShowInHierarchy(int index)
+        public void ShowInHierarchy(IReadOnlyList<GUIContent> content, int index)
         {
-            var instanceTypeName = _realtimeInstances[index].text;
+            var instanceTypeName = content[index].text;
             var pattern = "[^.]+$";
 
             var match = RegexExtension.FindMatch(pattern, instanceTypeName);
             
             if (!match.Success)
             {
-                Debug.LogWarning($"[{nameof(BindingsWindow)}] {_realtimeInstances[index].text} Not found from Project!");
+                Debug.LogWarning($"[{nameof(BindingsWindow)}] {content[index].text} Not found from Project!");
                 return;
             }
             
@@ -265,7 +342,7 @@ namespace DiExplorer.Editor.Panels
         
             if (type == null || !typeof(Component).IsAssignableFrom(type))
             {
-                Debug.LogError($"[{nameof(BindingsWindow)}] {_realtimeInstances[index].text} Type not found or not a Component!");
+                Debug.LogWarning($"[{nameof(BindingsWindow)}] {content[index].text} Type not found or not a Component!");
                 return;
             }
             
@@ -279,10 +356,35 @@ namespace DiExplorer.Editor.Panels
             }
             else
             {
-                Debug.LogWarning($"[{nameof(BindingsWindow)}] {_realtimeInstances[index].text} Object not found in the scene!");
+                Debug.LogWarning($"[{nameof(BindingsWindow)}] {content[index].text} Object not found in the scene!");
             }
         }
-        
+
+        private void AddInheritorsToContent(string selectedInstanceTypeName, ICollection<GUIContent> relatedItems, Rect position)
+        {
+            var inheritorsData = _diExplorerService.GetInheritors(selectedInstanceTypeName);
+            var icon = EditorGUIUtility.IconContent(AnimatorControllerIconName).image;
+
+            if (inheritorsData.Inheritors.Length > 0)
+            {
+                foreach (var inheritor in inheritorsData.Inheritors)
+                {
+                    var baseInheritorName = inheritor.ToString();
+                    var maxTextLength = (int)Mathf.Round(position.width - 240f);
+                    var inheritorName = CutString(baseInheritorName, maxTextLength);
+                    
+                    relatedItems.Add(new GUIContent(inheritorName, icon, baseInheritorName));
+                }
+            }
+        }
+
+        private string CutString(string baseString, int maxTextLength)
+        {
+            return baseString.Length * CharacterLength > maxTextLength
+                ? baseString.Substring(0, maxTextLength / CharacterLength) + "..."
+                : baseString;
+        }
+
         private static Type FindTypeByName(string typeName)
         {
             // Find type in the uploaded assemblies

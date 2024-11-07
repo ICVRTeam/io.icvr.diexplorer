@@ -21,6 +21,7 @@ using DiContainerDebugger.Scripts;
 using DiExplorer.Data;
 using DiExplorer.Entities;
 using DiExplorer.Interfaces;
+using DiExplorer.Storages;
 using UnityEngine;
 using Zenject;
 
@@ -28,17 +29,19 @@ namespace DiExplorer.Containers
 {
     internal abstract class AbstractContainer : IInstancesProvider, IBindingsProvider, ISignalsProvider
     {
-        public abstract string ContainerName { get; }
         protected SignalBus SignalBusInstance { get; }
-
+        protected InheritorsStorage _inheritorsStorage;
         protected abstract string GetContainerName();
         protected abstract Context GetContext();
 
-        protected AbstractContainer(SignalBus signalBusInstance)
+        public abstract string ContainerName { get; }
+
+        protected AbstractContainer(SignalBus signalBusInstance, InheritorsStorage inheritorsStorage)
         {
             SignalBusInstance = signalBusInstance;
+            _inheritorsStorage = inheritorsStorage;
         }
-        
+
         public SignalBus GetSignalBus()
         {
             var context = GetContext();
@@ -57,6 +60,8 @@ namespace DiExplorer.Containers
             foreach (var classType in bindedClassTypes)
             {
                 bindedClassDataList.Add(GetInjectables(contextName, classType));
+                
+                GetInheritorsByType(classType);
             }
 
             return bindedClassDataList.ToArray();
@@ -111,39 +116,6 @@ namespace DiExplorer.Containers
             }
 
             return instancesDataList.ToArray();
-        }
-
-        private BindingData GetInjectables(string contextName, Type classType)
-        {
-            var injectablesTypeList = new List<Type>();
-            var isMonoBehaviour = classType.BaseType == typeof(MonoBehaviour);
-            var typeInfo = TypeAnalyzer.TryGetInfo(classType);
-            
-            if (typeInfo == null)
-            {
-                return new BindingData(contextName, classType.ToString(), injectablesTypeList.ToArray(), isMonoBehaviour);
-            }
-            
-            var injectables = typeInfo.AllInjectables.ToArray();
-
-            if (!injectables.Any())
-            {
-                return new BindingData(contextName, classType.ToString(), injectablesTypeList.ToArray(), isMonoBehaviour);
-            }
-            
-            var injectableTypes = injectables.Select(info => info.MemberType).ToArray(); // get injectable types
-
-            foreach (var injectableType in injectableTypes)
-            {
-                if (injectableType == classType)
-                {
-                    break;
-                }
-                
-                injectablesTypeList.Add(injectableType);
-            }
-
-            return new BindingData(contextName, classType.ToString(), injectablesTypeList.ToArray(), isMonoBehaviour);
         }
 
         public virtual SubscriptionData[] GetSubscriptions()
@@ -220,6 +192,67 @@ namespace DiExplorer.Containers
             }
 
             return signalDataList.ToArray();
+        }
+
+        private BindingData GetInjectables(string contextName, Type classType)
+        {
+            var injectablesTypeList = new List<Type>();
+            var isMonoBehaviour = classType.BaseType == typeof(MonoBehaviour);
+            var typeInfo = TypeAnalyzer.TryGetInfo(classType);
+            
+            if (typeInfo == null)
+            {
+                return new BindingData(contextName, classType.ToString(), injectablesTypeList.ToArray(), isMonoBehaviour);
+            }
+            
+            var injectables = typeInfo.AllInjectables.ToArray();
+
+            if (!injectables.Any())
+            {
+                return new BindingData(contextName, classType.ToString(), injectablesTypeList.ToArray(), isMonoBehaviour);
+            }
+            
+            var injectableTypes = injectables.Select(info => info.MemberType).ToArray(); // get injectable types
+
+            foreach (var injectableType in injectableTypes)
+            {
+                if (injectableType == classType)
+                {
+                    break;
+                }
+                
+                injectablesTypeList.Add(injectableType);
+            }
+
+            return new BindingData(contextName, classType.ToString(), injectablesTypeList.ToArray(), isMonoBehaviour);
+        }
+
+        private void GetInheritorsByType(Type baseType)
+        {
+            var isContainsInheritor = _inheritorsStorage.Contains(baseType.ToString());
+
+            if (isContainsInheritor)
+            {
+                return;
+            }
+            
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var inheritors = new List<Type>();
+
+            foreach (var assembly in assemblies)
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (type.IsClass && !type.IsAbstract && baseType.IsAssignableFrom(type) && baseType != type)
+                    {
+                        inheritors.Add(type);
+                    }
+                }
+            }
+
+            var inheritorsData = new InheritorsData(baseType.ToString(), inheritors.ToArray());
+
+            _inheritorsStorage.Add(baseType.ToString(), inheritorsData);
         }
     }
 }

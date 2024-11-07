@@ -13,11 +13,22 @@
 // is strictly forbidden unless prior written permission is obtained
 // from ICVR LLC.
 
-namespace DiExplorer.Interfaces
+using System;
+using Newtonsoft.Json;
+
+namespace DiExplorer.Data
 {
-    internal interface ISerializator
+    [Serializable]
+    public struct InheritorsData
     {
-        public string Serialize<T>(T data);
-        public T Deserialize<T>(string stringData) where T : new();
+        public string BaseClassName { get; }
+        public Type[] Inheritors { get; }
+
+        [JsonConstructor]
+        public InheritorsData(string baseClassName, Type[] inheritors)
+        {
+            BaseClassName = baseClassName;
+            Inheritors = inheritors;
+        }
     }
 }

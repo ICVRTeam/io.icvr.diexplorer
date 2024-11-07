@@ -294,7 +294,7 @@ namespace DiContainerDebugger.Editor
                     // Signals
                     EditorGUILayout.BeginVertical(GUILayout.Width(position.width / 2f));
                     {
-                        EditorGUILayout.LabelField("Signals", EditorStyles.boldLabel);
+                        EditorGUILayout.LabelField($"Signals: {_signals.Count}", EditorStyles.boldLabel);
 
                         _signalsScrollPosition = EditorGUILayout.BeginScrollView(_signalsScrollPosition,
                             GUILayout.Height(position.height / 2.45f));
@@ -313,7 +313,7 @@ namespace DiContainerDebugger.Editor
                     // Subscriptions
                     EditorGUILayout.BeginVertical(GUILayout.Width(position.width / 2f));
                     {
-                        EditorGUILayout.LabelField("Subscriptions", EditorStyles.boldLabel);
+                        EditorGUILayout.LabelField($"Subscriptions: {_subscriptions.Count}", EditorStyles.boldLabel);
 
                         _subscriptionsScrollPosition = EditorGUILayout.BeginScrollView(_subscriptionsScrollPosition,
                             GUILayout.Height(position.height / 2.45f));
@@ -322,6 +322,8 @@ namespace DiContainerDebugger.Editor
                             {
                                 GUILayout.BeginHorizontal();
                                 {
+                                    ShowIndex(i);
+                                    
                                     GUIStyle style = _signalsPanel.SubscriptionsSelectedIndex == i
                                         ? EditorElementStyle.SelectedListElementStyle
                                         : EditorElementStyle.ListElementDefaultStyle;
@@ -414,9 +416,13 @@ namespace DiContainerDebugger.Editor
                     // Signal log panel
                     EditorGUILayout.BeginHorizontal();
                     {
+                        var scrollHeightOption = _signalCallsDictionary.Keys.Count > NumberDisplayedSignals
+                            ? GUILayout.ExpandWidth(true)
+                            : GUILayout.Height(SignalRowHeight * _signalCallsDictionary.Keys.Count + 10f);
+                        
                         // Signal names
                         _signalNameScrollPos = EditorGUILayout.BeginScrollView(_signalNameScrollPos, 
-                            GUILayout.Height(SignalRowHeight * NumberDisplayedSignals + 10f), 
+                            scrollHeightOption, 
                             GUILayout.Width(WidthSignalNameArea));
                         {
                             EditorGUILayout.BeginVertical(GUILayout.Width(WidthSignalNameArea));
@@ -434,7 +440,7 @@ namespace DiContainerDebugger.Editor
 
                         // Signal calls log
                         _signalScrollPos = EditorGUILayout.BeginScrollView(_signalScrollPos,
-                            GUILayout.Height(SignalRowHeight * NumberDisplayedSignals + 10f), GUILayout.ExpandWidth(true));
+                            scrollHeightOption, GUILayout.ExpandWidth(true));
                         {
                             DrawSignalEvents();
                         }
@@ -469,6 +475,14 @@ namespace DiContainerDebugger.Editor
             }
 
             _signalNameScrollPos.y = _signalScrollPos.y;
+        }
+        
+        private void ShowIndex(int i)
+        {
+            var displayedIndex = i + 1;
+
+            GUILayout.Label(displayedIndex.ToString(),
+                EditorElementStyle.BindingCountLabel);
         }
 
         private void DrawTimeScale()

@@ -13,6 +13,7 @@
 // is strictly forbidden unless prior written permission is obtained
 // from ICVR LLC.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DiExplorer.Data;
@@ -28,6 +29,7 @@ namespace DiExplorer.Entities
         private readonly Dictionary<string, SignalData[]> _containerSignals = new Dictionary<string, SignalData[]>();
         private readonly Dictionary<string, SubscriptionData[]> _containerSubscriptions = new Dictionary<string, SubscriptionData[]>();
         private readonly Dictionary<string, SignalCallData[]> _signalCalls = new Dictionary<string, SignalCallData[]>();
+        private readonly Dictionary<string, InheritorsData> _inheritors = new Dictionary<string, InheritorsData>();
 
         public string[] GetContainerNames()
         {
@@ -57,6 +59,16 @@ namespace DiExplorer.Entities
         public SignalCallData[] GetSignalCalls(string signalTypeName)
         {
             return DictionaryExtension.GetData(_signalCalls, signalTypeName);
+        }
+
+        public InheritorsData GetInheritors(string baseType)
+        {
+            if (_inheritors.TryGetValue(baseType, out var inheritorsData))
+            {
+                return inheritorsData;
+            }
+
+            return new InheritorsData(baseType, Array.Empty<Type>());
         }
 
         public BindingData[] GetAllBindings()
@@ -128,6 +140,13 @@ namespace DiExplorer.Entities
 
             return subscriptionsTypeName.ToArray();
         }
+        
+        public int GetInheritorsCountByClass(string baseClass)
+        {
+            return _inheritors.TryGetValue(baseClass, out var inheritor) 
+                ? inheritor.Inheritors.Length 
+                : 0;
+        }
 
         public void SetBindings(string containerName, BindingData[] bindings)
         {
@@ -166,11 +185,21 @@ namespace DiExplorer.Entities
                 _signalCalls.Add(signalCall.Key, signalCall.Value);
             }
         }
+        
+        public void SetInheritors(Dictionary<string, InheritorsData> inheritorsDictionary)
+        {
+            _inheritors.Clear();
+
+            foreach (var pair in inheritorsDictionary)
+            {
+                _inheritors.Add(pair.Key, pair.Value);
+            }
+        }
 
         internal SavedData GetSavedData()
         {
             var savedData = new SavedData(_containerBindings, _containerInstances, _containerSignals,
-                _containerSubscriptions, _signalCalls);
+                _containerSubscriptions, _signalCalls, _inheritors);
 
             return savedData;
         }
@@ -182,6 +211,7 @@ namespace DiExplorer.Entities
             _containerSignals.Clear();
             _containerSubscriptions.Clear();
             _signalCalls.Clear();
+            _inheritors.Clear();
 
             foreach (var containerBinding in savedData.ContainerBindings)
             {
@@ -206,6 +236,11 @@ namespace DiExplorer.Entities
             foreach (var signalCall in savedData.SignalCalls)
             {
                 _signalCalls.Add(signalCall.Key, signalCall.Value);
+            }
+            
+            foreach (var inheritors in savedData.Inheritors)
+            {
+                _inheritors.Add(inheritors.Key, inheritors.Value);
             }
         }
     }

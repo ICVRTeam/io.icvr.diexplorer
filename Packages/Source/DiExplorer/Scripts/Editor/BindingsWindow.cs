@@ -29,6 +29,8 @@ namespace DiContainerDebugger.Editor
     internal class BindingsWindow : ZenjectEditorWindow
     {
         private const int Unselected = -1;
+        private const string ScriptIconName = "cs Script Icon";
+        private const string CameraIconName = "Camera Icon";
         
         private List<GUIContent> _relatedItems = new List<GUIContent>();
         private List<GUIContent> _realtimeInstances = new List<GUIContent>();
@@ -41,7 +43,7 @@ namespace DiContainerDebugger.Editor
         private Vector2 _realtimeInstancesScrollPosition;
         private Vector2 _bindingsScrollPosition;
         
-        private int _relatedItemsSelectedIndex = Unselected;
+        private BindingsPanel.SearchGroup _searchGroup = BindingsPanel.SearchGroup.Bindings;
         
         private GUIContent _passedIcon;
         private GUIContent _errorIcon;
@@ -107,6 +109,11 @@ namespace DiContainerDebugger.Editor
         {
             switch (state)
             {
+                case PlayModeStateChange.ExitingEditMode:
+                {
+                    _diExplorerService.CollectSceneInstances();
+                    break;
+                }
                 case PlayModeStateChange.EnteredPlayMode:
                 {
                     InjectFromProjectContext();
@@ -160,13 +167,13 @@ namespace DiContainerDebugger.Editor
 
         private void CreateContent()
         {
-            _realtimeInstances = _bindingsPanel.CreateInstancesContent().ToList();
-            _bindings = _bindingsPanel.CreateBindingsContent().ToList();
+            _realtimeInstances = _bindingsPanel.CreateInstancesContent(position).ToList();
+            _bindings = _bindingsPanel.CreateBindingsContent(position).ToList();
         }
 
         private void ProcessItemSelection()
         {
-            _relatedItems = _bindingsPanel.ProcessItemSelection().ToList();
+            _relatedItems = _bindingsPanel.ProcessItemSelection(position).ToList();
         }
 
         private void OnGUI()
@@ -184,8 +191,6 @@ namespace DiContainerDebugger.Editor
         {
             EditorGUILayout.BeginVertical();
             {
-                //EditorGUILayout.LabelField("Bindings", EditorStyles.boldLabel);
-
                 EditorGUILayout.Separator();
                 
                 // Top Panel
@@ -202,6 +207,7 @@ namespace DiContainerDebugger.Editor
                         if (newSelectedIndex != _bindingsContextPanel.ContextSelectedIndex)
                         {
                             _bindingsContextPanel.SetSelectedIndex(newSelectedIndex);
+                            _bindingsPanel.ResetRelatedSelectedIndex();
                         }
                         
                         GUILayout.Space(5f);
@@ -223,17 +229,31 @@ namespace DiContainerDebugger.Editor
 
                     GUILayout.FlexibleSpace();
 
-                    // Bindings Search String
-                    GUILayout.BeginHorizontal(GUI.skin.FindStyle("Toolbar"), GUILayout.Width(position.width / 2f));
+                    // Bindings and Instances Search String
+                    GUILayout.BeginHorizontal(GUILayout.Width(position.width / 2f));
                     {
-                        _bindingsPanel.SetBindingsSearchString(GUILayout.TextField(_bindingsPanel.BindingsSearchString,
-                            EditorElementStyle.ToolbarSearchTextField,
-                            GUILayout.ExpandWidth(true)));
-                        if (GUILayout.Button("", EditorElementStyle.ToolbarSearchCancelButton))
+                        var popupOptions = System.Enum.GetNames(typeof(BindingsPanel.SearchGroup));
+                        var selectedIndex = (int)_searchGroup;
+
+                        GUILayout.Label("Search Group", GUILayout.Width(85f));
+                        
+                        selectedIndex = EditorGUILayout.Popup(selectedIndex, popupOptions,
+                            GUILayout.Width(85f));
+                        
+                        _searchGroup = (BindingsPanel.SearchGroup)selectedIndex;
+                        
+                        GUILayout.BeginHorizontal(GUI.skin.FindStyle("Toolbar"));
                         {
-                            _bindingsPanel.SetBindingsSearchString(string.Empty);
-                            GUI.FocusControl(null);
+                            _bindingsPanel.SetSearchString(GUILayout.TextField(_bindingsPanel.SearchString,
+                                EditorElementStyle.ToolbarSearchTextField,
+                                GUILayout.ExpandWidth(true)), _searchGroup);
+                            if (GUILayout.Button("", EditorElementStyle.ToolbarSearchCancelButton))
+                            {
+                                _bindingsPanel.SetSearchString(string.Empty, _searchGroup);
+                                GUI.FocusControl(null);
+                            }
                         }
+                        GUILayout.EndHorizontal();
                     }
                     GUILayout.EndHorizontal();
                 }
@@ -247,19 +267,43 @@ namespace DiContainerDebugger.Editor
                     // Realtime Instances Zone
                     EditorGUILayout.BeginVertical(GUILayout.Width(position.width / 2f));
                     {
-                        EditorGUILayout.LabelField("Realtime Instances", EditorStyles.boldLabel);
+                        EditorGUILayout.LabelField($"Realtime Instances: {_realtimeInstances.Count}", EditorStyles.boldLabel);
                         _realtimeInstancesScrollPosition =
                             EditorGUILayout.BeginScrollView(_realtimeInstancesScrollPosition,
                                 GUILayout.Height(position.height / 2));
                         {
                             for (var i = 0; i < _realtimeInstances.Count; i++)
                             {
-                                // Используем кнопку для каждого элемента в списке
-                                if (GUILayout.Button(_realtimeInstances[i], EditorElementStyle.ListElementDefaultStyle))
+                                GUILayout.BeginHorizontal();
                                 {
-                                    // Обработка нажатия на элемент
-                                    HandleRealtimeInstanceClick(i);
+                                    ShowIndex(i);
+
+                                    var style = _bindingsPanel.RealtimeSelectedIndex == i
+                                        ? EditorElementStyle.SelectedListElementStyle
+                                        : EditorElementStyle.ListElementDefaultStyle;
+
+                                    if (_bindingsPanel.RelatedItemSelectedIndex != Unselected)
+                                    {
+                                        if (_realtimeInstances[i].tooltip ==
+                                            _relatedItems[_bindingsPanel.RelatedItemSelectedIndex].tooltip)
+                                        {
+                                            style = EditorElementStyle.InfoListElementStyle;
+                                        }
+                                    }
+
+                                    if (GUILayout.Button(_realtimeInstances[i], style,
+                                            GUILayout.Width(position.width / 2f - 100f)))
+                                    {
+                                        HandleRealtimeInstanceClick(_realtimeInstances, i);
+                                    }
+
+                                    if (GUILayout.Button(EditorGUIUtility.IconContent(ScriptIconName).image, style,
+                                            GUILayout.Width(20f)))
+                                    {
+                                        _bindingsPanel.ShowInProject(_realtimeInstances, i);
+                                    }
                                 }
+                                GUILayout.EndHorizontal();
                             }
                         }
                         EditorGUILayout.EndScrollView();
@@ -269,7 +313,12 @@ namespace DiContainerDebugger.Editor
                     // Bindings zone
                     EditorGUILayout.BeginVertical(GUILayout.Width(position.width / 2f));
                     {
-                        EditorGUILayout.LabelField("Bindings", EditorStyles.boldLabel);
+                        EditorGUILayout.BeginHorizontal();
+                        {
+                            GUILayout.Label($"Bindings: {_bindings.Count}", EditorStyles.boldLabel);
+                        }
+                        EditorGUILayout.EndHorizontal();
+                        
                         _bindingsScrollPosition = EditorGUILayout.BeginScrollView(_bindingsScrollPosition,
                             GUILayout.Height(position.height / 2));
                         {
@@ -277,26 +326,44 @@ namespace DiContainerDebugger.Editor
                             {
                                 GUILayout.BeginHorizontal();
                                 {
+                                    ShowIndex(i);
+                                    
                                     var style = _bindingsPanel.BindingSelectedIndex == i
                                         ? EditorElementStyle.SelectedListElementStyle
                                         : EditorElementStyle.ListElementDefaultStyle;
 
-                                    if (GUILayout.Button(new GUIContent(_bindings[i]), style))
+                                    if (_bindingsPanel.RelatedItemSelectedIndex != Unselected)
+                                    {
+                                        if (_bindings[i].tooltip == _relatedItems[_bindingsPanel.RelatedItemSelectedIndex].tooltip)
+                                        {
+                                            style = EditorElementStyle.InfoListElementStyle;
+                                        }
+                                    }
+
+                                    if (GUILayout.Button(new GUIContent(_bindings[i]), style,
+                                            GUILayout.Width(position.width / 2f - 183f)))
                                     {
                                         _bindingsPanel.SetBindingSelectedIndex(i);
-                                        
-                                        if (_bindingsPanel.BindingSelectedIndex != _bindingsPanel.PrevBindingSelectedIndex)
+
+                                        if (_bindingsPanel.BindingSelectedIndex !=
+                                            _bindingsPanel.PrevBindingSelectedIndex)
                                         {
-                                            _relatedItemsSelectedIndex = Unselected;
+                                            _bindingsPanel.SetRelatedItemSelectedIndex(Unselected);
                                         }
 
                                         _bindingsPanel.ResetSelectedIndexExceptBindings();
                                     }
 
                                     var countInstance = _diExplorerService
-                                        .GetInstanceNamesFromBinding(_bindings[i].text).Length;
+                                        .GetInstanceNamesFromBinding(_bindings[i].tooltip).Length;
 
                                     GUILayout.Label(countInstance.ToString(),
+                                        EditorElementStyle.BindingCountLabel);
+
+                                    var countInheritors =
+                                        _diExplorerService.GetInheritorsCountByClass(_bindings[i].tooltip);
+                                    
+                                    GUILayout.Label(countInheritors.ToString(),
                                         EditorElementStyle.BindingCountLabel);
                                 }
                                 GUILayout.EndHorizontal();
@@ -313,15 +380,46 @@ namespace DiContainerDebugger.Editor
                 // Related Items
                 EditorGUILayout.BeginVertical();
                 {
-                    GUILayout.FlexibleSpace();
-                    EditorGUILayout.LabelField("Related items", EditorStyles.boldLabel);
+                    EditorGUILayout.LabelField(
+                        $"Related items {_bindingsPanel.SelectedItemForRelated}: {_relatedItems.Count}",
+                        EditorStyles.boldLabel);
+                    
                     _relatedItemsScrollPosition =
                         EditorGUILayout.BeginScrollView(_relatedItemsScrollPosition);
                     {
-                        _relatedItemsSelectedIndex = GUILayout.SelectionGrid(_relatedItemsSelectedIndex,
-                            _relatedItems.ToArray(), 1, EditorElementStyle.ListElementDefaultStyle);
+                        for (var i = 0; i < _relatedItems.Count; i++)
+                        {
+                            GUILayout.BeginHorizontal();
+                            {
+                                ShowIndex(i);
+                                
+                                var style = _bindingsPanel.RelatedItemSelectedIndex == i
+                                    ? EditorElementStyle.SelectedListElementStyle
+                                    : EditorElementStyle.ListElementDefaultStyle;
+
+                                if (GUILayout.Button(_relatedItems[i], style, GUILayout.Width(position.width - 125f)))
+                                {
+                                    HandleRelatedItemsClick(_relatedItems, i);
+                                }
+                                
+                                if (GUILayout.Button(EditorGUIUtility.IconContent(ScriptIconName).image, EditorElementStyle.ListElementDefaultStyle,
+                                        GUILayout.Width(20f)))
+                                {
+                                    _bindingsPanel.ShowInProject(_relatedItems, i);
+                                }
+                                
+                                if (GUILayout.Button(EditorGUIUtility.IconContent(CameraIconName).image, EditorElementStyle.ListElementDefaultStyle,
+                                        GUILayout.Width(20f)))
+                                {
+                                    _bindingsPanel.ShowInHierarchy(_relatedItems, i);
+                                }
+                            }
+                            GUILayout.EndHorizontal();
+                        }
                     }
                     EditorGUILayout.EndScrollView();
+                    
+                    GUILayout.FlexibleSpace();
                 }
                 EditorGUILayout.EndVertical();
 
@@ -330,8 +428,16 @@ namespace DiContainerDebugger.Editor
                 
             EditorGUILayout.Separator();
         }
-        
-        private void HandleRealtimeInstanceClick(int index)
+
+        private void ShowIndex(int i)
+        {
+            var displayedIndex = i + 1;
+
+            GUILayout.Label(displayedIndex.ToString(),
+                EditorElementStyle.BindingCountLabel);
+        }
+
+        private void HandleRealtimeInstanceClick(IReadOnlyList<GUIContent> content, int index)
         {
             if (Event.current.button == 0) // Left mouse button
             {
@@ -339,14 +445,25 @@ namespace DiContainerDebugger.Editor
                 
                 if (_bindingsPanel.RealtimeSelectedIndex != _bindingsPanel.PrevRealtimeSelectedIndex)
                 {
-                    _relatedItemsSelectedIndex = Unselected;
+                    _bindingsPanel.SetRelatedItemSelectedIndex(Unselected);
                 }
 
                 _bindingsPanel.ResetSelectedIndexExceptInstances();
             }
             else if (Event.current.button == 1) // Right mouse button
             {
-                _bindingsPanel.ShowContextMenu(index);
+                _bindingsPanel.ShowInstanceContextMenu(content, index);
+            }
+        }
+        private void HandleRelatedItemsClick(IReadOnlyList<GUIContent> content, int index)
+        {
+            if (Event.current.button == 0) // Left mouse button
+            {
+                _bindingsPanel.SetRelatedItemSelectedIndex(index);
+            }
+            else if (Event.current.button == 1) // Right mouse button
+            {
+                _bindingsPanel.ShowRelatedItemContextMenu(content, index);
             }
         }
         

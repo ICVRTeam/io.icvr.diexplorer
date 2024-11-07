@@ -13,30 +13,28 @@
 // is strictly forbidden unless prior written permission is obtained
 // from ICVR LLC.
 
-using DiExplorer.Interfaces;
-using Newtonsoft.Json;
+using System.Collections.Generic;
+using DiExplorer.Data;
 
-namespace DiExplorer.Entities
+namespace DiExplorer.Storages
 {
-    internal class JsonSerializator : ISerializator
+    public class InheritorsStorage
     {
-        public string Serialize<T>(T savedData)
-        {
-            var jsonString = JsonConvert.SerializeObject(savedData, Formatting.Indented);
+        private readonly Dictionary<string, InheritorsData> _inheritors = new Dictionary<string, InheritorsData>();
 
-            return jsonString;
+        public bool Contains(string baseClass)
+        {
+            return _inheritors.ContainsKey(baseClass);
         }
 
-        public T Deserialize<T>(string stringData) where T : new()
+        public void Add(string baseClass, InheritorsData inheritorsData)
         {
-            if (stringData == string.Empty)
-            {
-                return new T();
-            }
-            
-            var savedData = JsonConvert.DeserializeObject<T>(stringData);
-
-            return savedData;
+            _inheritors.Add(baseClass, inheritorsData);
         }
+
+        public Dictionary<string, InheritorsData> GetInheritorsDictionary()
+        {
+            return _inheritors;
+        } 
     }
 }

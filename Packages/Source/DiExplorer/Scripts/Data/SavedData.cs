@@ -24,19 +24,22 @@ namespace DiExplorer.Data
         public readonly Dictionary<string, SignalData[]> ContainerSignals;
         public readonly Dictionary<string, SubscriptionData[]> ContainerSubscriptions;
         public readonly Dictionary<string, SignalCallData[]> SignalCalls;
+        public readonly Dictionary<string, InheritorsData> Inheritors;
 
         public SavedData(
             Dictionary<string, BindingData[]> containerBindings,
             Dictionary<string, InstanceData[]> containerInstances, 
             Dictionary<string, SignalData[]> containerSignals,
             Dictionary<string, SubscriptionData[]> containerSubscriptions,
-            Dictionary<string, SignalCallData[]> signalCalls)
+            Dictionary<string, SignalCallData[]> signalCalls,
+            Dictionary<string, InheritorsData> inheritors)
         {
             ContainerBindings = containerBindings;
             ContainerInstances = containerInstances;
             ContainerSignals = containerSignals;
             ContainerSubscriptions = containerSubscriptions;
             SignalCalls = signalCalls;
+            Inheritors = inheritors;
         }
     }
 }

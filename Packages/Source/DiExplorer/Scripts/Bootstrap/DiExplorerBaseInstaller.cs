@@ -27,13 +27,16 @@ namespace DiExplorer.Scripts.Bootstrap
         {
             Container.Bind<DiExplorerModel>().AsSingle();
             Container.Bind<DiExplorerService>().AsSingle();
-            
-            Container.Bind<DependenciesRepository>().AsSingle();
+
+            Container.Bind<FileDataManager>().AsSingle();
             Container.Bind<ISerializator>().To<JsonSerializator>().AsSingle();
 
-            Container.Bind<PlayModeTimer>().AsSingle();
             Container.Bind<SignalCallsCollector>().AsSingle();
+            Container.Bind<SceneComponentsCollector>().AsSingle();
+            
+            Container.Bind<PlayModeTimer>().AsSingle();
             Container.Bind<StaticAnalyzer>().AsSingle();
+            Container.Bind<InheritorsStorage>().AsSingle();
         }
     }
 }

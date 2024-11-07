@@ -17,6 +17,9 @@ using System.Collections.Generic;
 using System.Linq;
 using DiContainerDebugger.Scripts;
 using DiExplorer.Data;
+using DiExplorer.Entities;
+using DiExplorer.Scripts.Data;
+using DiExplorer.Storages;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Zenject;
@@ -27,9 +30,18 @@ namespace DiExplorer.Containers
 {
     internal class SceneContainer : AbstractContainer
     {
+        private SceneComponentsCollector _sceneComponentsCollector;
         public override string ContainerName => GetContainerName();
 
-        public SceneContainer(SignalBus signalBusInstance) : base(signalBusInstance) { }
+        public SceneContainer(
+            SignalBus signalBusInstance, 
+            InheritorsStorage inheritorsStorage,
+            SceneComponentsCollector sceneComponentsCollector)
+            : base(signalBusInstance, inheritorsStorage)
+        {
+            _sceneComponentsCollector = sceneComponentsCollector;
+            _sceneComponentsCollector.LoadSceneComponents();
+        }
 
         protected override string GetContainerName()
         {
@@ -59,7 +71,9 @@ namespace DiExplorer.Containers
                 ZenUtilInternal.GetInjectableMonoBehavioursUnderGameObject(monoBehaviour.gameObject, componentList);
             }
 
-            foreach (var component in componentList)
+            var uniqComponents = componentList.Distinct();
+
+            foreach (var component in uniqComponents)
             {
                 var componentType = component.GetType();
                 var typeInfo = TypeAnalyzer.TryGetInfo(componentType);
@@ -74,7 +88,24 @@ namespace DiExplorer.Containers
                 if (injectables.Any())
                 {
                     var injectableTypes = injectables.Select(info => info.MemberType.ToString()).ToArray();
-                    instancesDataList.Add(new InstanceData(contextName, componentType.ToString(), InstanceType.SceneMono, injectableTypes));
+                    var sceneName = GetContainerName();
+
+                    var componentInScene = new ComponentData();
+
+                    if (_sceneComponentsCollector.СomponentsInBuildScenes.TryGetValue(sceneName, out var components))
+                    {
+                        componentInScene =
+                            components.FirstOrDefault(data => data.InstanceTypeName == componentType.ToString());
+                    }
+
+                    if (componentInScene.InstanceTypeName == null)
+                    {
+                        instancesDataList.Add(new InstanceData(contextName, componentType.ToString(), InstanceType.DynamicMono, injectableTypes));
+                    }
+                    else
+                    {
+                        instancesDataList.Add(new InstanceData(contextName, componentType.ToString(), InstanceType.SceneMono, injectableTypes));
+                    }
                 }
             }
 
