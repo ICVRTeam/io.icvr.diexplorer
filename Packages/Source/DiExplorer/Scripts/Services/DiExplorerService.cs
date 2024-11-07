@@ -25,23 +25,31 @@ namespace DiExplorer.Services
 {
     internal class DiExplorerService
     {
+        private const string DiExplorerFileName = "DiExplorerSaves.json";
+        
         private List<AbstractContainer> _abstractContainers;
+        private InheritorsStorage _inheritorsStorage;
         private DiExplorerModel _diExplorerModel;
-        private DependenciesRepository _dependenciesRepository;
+        private FileDataManager _fileDataManager;
         private PlayModeTimer _playModeTimer;
+        private SceneComponentsCollector _sceneComponentsCollector;
         private ISerializator _serializator;
 
         internal DiExplorerService(
             List<AbstractContainer> abstractContainers,
-            DiExplorerModel diExplorerModel, 
-            DependenciesRepository dependenciesRepository,
+            InheritorsStorage inheritorsStorage, 
+            DiExplorerModel diExplorerModel,
+            FileDataManager fileDataManager,
             PlayModeTimer playModeTimer,
+            SceneComponentsCollector sceneComponentsCollector,
             ISerializator serializator)
         {
             _abstractContainers = abstractContainers;
+            _inheritorsStorage = inheritorsStorage;
             _diExplorerModel = diExplorerModel;
-            _dependenciesRepository = dependenciesRepository;
+            _fileDataManager = fileDataManager;
             _playModeTimer = playModeTimer;
+            _sceneComponentsCollector = sceneComponentsCollector;
             _serializator = serializator;
         }
 
@@ -60,6 +68,9 @@ namespace DiExplorer.Services
 
                 var signals = abstractContainer.GetSignals(subscriptions);
                 _diExplorerModel.SetSignals(abstractContainer.ContainerName, signals);
+
+                var inheritors = _inheritorsStorage.GetInheritorsDictionary();
+                _diExplorerModel.SetInheritors(inheritors);
             }
         }
 
@@ -82,19 +93,20 @@ namespace DiExplorer.Services
         {
             var savedData = _diExplorerModel.GetSavedData();
             var savedString = _serializator.Serialize(savedData);
-            _dependenciesRepository.Save(savedString);
+            _fileDataManager.Save(DiExplorerFileName, savedString);
         }
 
         internal void LoadModel()
         {
-            var stringData = _dependenciesRepository.Load();
-            var savedData = _serializator.Deserialize(stringData);
+            var stringData = _fileDataManager.Load(DiExplorerFileName);
+            var savedData = _serializator.Deserialize<SavedData>(stringData);
 
             var containerBindings = new Dictionary<string, BindingData[]>();
             var containerInstances = new Dictionary<string, InstanceData[]>();
             var containerSignals = new Dictionary<string, SignalData[]>();
             var containerSubscriptions = new Dictionary<string, SubscriptionData[]>();
             var signalCalls = new Dictionary<string, SignalCallData[]>();
+            var inheritors = new Dictionary<string, InheritorsData>();
 
             if (savedData.ContainerBindings != null)
             {
@@ -121,8 +133,13 @@ namespace DiExplorer.Services
                 signalCalls = savedData.SignalCalls;
             }
 
+            if (savedData.Inheritors != null)
+            {
+                inheritors = savedData.Inheritors;
+            }
+
             var newSavedData = new SavedData(containerBindings, containerInstances, containerSignals,
-                containerSubscriptions, signalCalls);
+                containerSubscriptions, signalCalls, inheritors);
             
             _diExplorerModel.SetSavedData(newSavedData);
         }
@@ -172,6 +189,11 @@ namespace DiExplorer.Services
             return _diExplorerModel.GetAllSignalCalls();
         }
 
+        internal InheritorsData GetInheritors(string baseType)
+        {
+            return _diExplorerModel.GetInheritors(baseType);
+        }
+
         public Dictionary<string, SignalCallData[]> GetSignalCallDictionary()
         {
             return _diExplorerModel.GetSignalCallDictionary();
@@ -202,9 +224,19 @@ namespace DiExplorer.Services
             return _diExplorerModel.GetSubscriptionNamesFromSignal(signalTypeName);
         }
 
+        public int GetInheritorsCountByClass(string baseClass)
+        {
+            return _diExplorerModel.GetInheritorsCountByClass(baseClass);
+        }
+
         public TimeSpan GetElapsedTimePlayModeTimer()
         {
             return _playModeTimer.GetElapsedTime();
+        }
+
+        public void CollectSceneInstances()
+        {
+            _sceneComponentsCollector.CollectAllSceneComponents();
         }
     }
 }

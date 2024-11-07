@@ -18,28 +18,26 @@ using UnityEngine;
 
 namespace DiExplorer.Storages
 {
-    internal class DependenciesRepository
+    internal class FileDataManager
     {
-        private const string FileName = "DiExplorerSaves.json";
-
-        public void Save(string savedString)
+        public void Save(string filePath, string savedString)
         {
-            File.WriteAllText(FileName, savedString);
+            File.WriteAllText(filePath, savedString);
         }
   
-        public string Load()
+        public string Load(string filePath)
         {
-            if (File.Exists(FileName))
+            if (File.Exists(filePath))
             {
-                var jsonString = File.ReadAllText(FileName);
+                var jsonString = File.ReadAllText(filePath);
                 return jsonString;
             }
 
             Debug.LogWarning
             (
-                $"[{nameof(DependenciesRepository)}] " +
+                $"[{nameof(FileDataManager)}] " +
                 $"An attempt to download data from a non-existent file! " +
-                $"The file will be created when switching to Pay Mode."
+                $"The file will be created when switching to Play Mode."
             );
             
             return string.Empty;

@@ -13,11 +13,19 @@
 // is strictly forbidden unless prior written permission is obtained
 // from ICVR LLC.
 
-namespace DiExplorer.Interfaces
+namespace DiExplorer.Scripts.Data
 {
-    internal interface ISerializator
+    public struct ComponentData
     {
-        public string Serialize<T>(T data);
-        public T Deserialize<T>(string stringData) where T : new();
+        public string SceneName;
+        public string InstanceTypeName;
+        public int[] GameObjectHashes;
+
+        public ComponentData(string sceneName, string instanceTypeName, int[] gameObjectHashes)
+        {
+            SceneName = sceneName;
+            InstanceTypeName = instanceTypeName;
+            GameObjectHashes = gameObjectHashes;
+        }
     }
 }

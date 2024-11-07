@@ -13,6 +13,7 @@
 // is strictly forbidden unless prior written permission is obtained
 // from ICVR LLC.
 
+using DiExplorer.Storages;
 using Zenject;
 
 namespace DiExplorer.Containers
@@ -23,7 +24,10 @@ namespace DiExplorer.Containers
 
         public override string ContainerName => GetContainerName();
 
-        public ProjectContainer(SignalBus signalBusInstance) : base(signalBusInstance) { }
+        public ProjectContainer(
+            SignalBus signalBusInstance,
+            InheritorsStorage inheritorsStorage)
+            : base(signalBusInstance, inheritorsStorage) { }
 
         protected override string GetContainerName()
         {

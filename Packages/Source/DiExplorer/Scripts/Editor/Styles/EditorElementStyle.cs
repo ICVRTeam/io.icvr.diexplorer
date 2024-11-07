@@ -21,6 +21,7 @@ namespace DiContainerDebugger.Editor.Styles
     {
         private static readonly Color HoverColor = new Color(0.42f, 0.78f, 1f);
         private static readonly Color SelectedColor = new Color(0.24f, 0.49f, 0.91f);
+        private static readonly Color InfoColor = Color.yellow;
         
         public static readonly GUIStyle ListElementDefaultStyle = new GUIStyle(GUI.skin.box)
         {
@@ -37,6 +38,12 @@ namespace DiContainerDebugger.Editor.Styles
         {
             hover = { textColor = SelectedColor },
             normal = { textColor = SelectedColor } // After clicking
+        };
+        
+        public static readonly GUIStyle InfoListElementStyle = new GUIStyle(ListElementDefaultStyle)
+        {
+            hover = { textColor = InfoColor },
+            normal = { textColor = InfoColor }
         };
 
         public static readonly GUIStyle BindingCountLabel = new GUIStyle(GUI.skin.box)
