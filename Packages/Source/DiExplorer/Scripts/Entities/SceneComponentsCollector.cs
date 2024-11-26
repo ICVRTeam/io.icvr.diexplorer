@@ -15,6 +15,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using DiExplorer.Extensions;
 using DiExplorer.Interfaces;
 using DiExplorer.Scripts.Data;
 using DiExplorer.Storages;
@@ -35,8 +36,6 @@ namespace DiExplorer.Entities
                 ComponentsInBuildScenes = componentsInBuildScenes;
             }
         }
-        
-        private const string SceneComponentsFileName = "SceneComponentsSaves.json";
 
         private readonly FileDataManager _fileDataManager;
         private readonly ISerializator _serializator;
@@ -84,7 +83,7 @@ namespace DiExplorer.Entities
 
         public void LoadSceneComponents()
         {
-            var stringData = _fileDataManager.Load(SceneComponentsFileName);
+            var stringData = _fileDataManager.Load(CashFileConst.SceneComponentsFileName);
             var savedData = _serializator.Deserialize<SceneComponentsData>(stringData);
 
             if (savedData.ComponentsInBuildScenes != null)
@@ -97,7 +96,7 @@ namespace DiExplorer.Entities
         {
             var savedData = new SceneComponentsData(СomponentsInBuildScenes);
             var savedString = _serializator.Serialize(savedData);
-            _fileDataManager.Save(SceneComponentsFileName, savedString);
+            _fileDataManager.Save(CashFileConst.SceneComponentsFileName, savedString);
         }
 
         private void AddGameObjectNames(string sceneName, GameObject obj)

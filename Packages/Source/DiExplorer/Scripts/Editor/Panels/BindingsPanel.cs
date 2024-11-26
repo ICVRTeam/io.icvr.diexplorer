@@ -37,23 +37,24 @@ namespace DiExplorer.Editor.Panels
         
         private const int Unselected = -1;
         private const int CharacterLength = 6;
-        private const string NoMonoIconName = "d_ScriptableObject Icon";
-        private const string DynamicMonoIconName = "d_Prefab Icon";
-        private const string SceneMonoIconName = "d_TerrainInspector.TerrainToolRaise";
         private const string GameObjectIconName = "GameObject Icon";
         private const string BoxColliderIconName = "BoxCollider Icon";
         private const string AnimatorControllerIconName = "AnimatorController Icon";
 
+        private readonly List<GUIContent> _bindings = new List<GUIContent>();
+        private readonly List<(GUIContent Content, int Count)> _realtimeInstances = new List<(GUIContent, int)>();
+        
         private BindingData[] _bindingsData;
-        private InstanceData[] _instancesData;
-
-        private List<GUIContent> _bindings = new List<GUIContent>();
-        private List<GUIContent> _realtimeInstances = new List<GUIContent>();
+        private (InstanceData Data, int Count)[] _instancesData;
 
         private SearchGroup _searchGroup;
         private string _prevSearchString = "string.Empty";
         
         private DiExplorerService _diExplorerService;
+        
+        public const string NoMonoIconName = "d_ScriptableObject Icon";
+        public const string DynamicMonoIconName = "d_Prefab Icon";
+        public const string SceneMonoIconName = "d_TerrainInspector.TerrainToolRaise";
         
         public int BindingSelectedIndex { get; private set; } = Unselected;
         public int PrevBindingSelectedIndex { get; private set; } = Unselected;
@@ -62,6 +63,11 @@ namespace DiExplorer.Editor.Panels
         public int RelatedItemSelectedIndex { get; private set; } = Unselected;
         public string SearchString { get; private set; } = string.Empty;
         public string SelectedItemForRelated { get; private set; }
+        public bool InstancesIsScrollToIndex { get; private set; }
+        public bool BindingsIsScrollToIndex { get; private set; }
+        public bool ShowNoMonoInstances { get; private set; } = true;
+        public bool ShowDynamicMonoInstances { get; private set; } = true;
+        public bool ShowSceneMonoInstances { get; private set; } = true;
 
 
         public BindingsPanel(DiExplorerService diExplorerService)
@@ -71,17 +77,28 @@ namespace DiExplorer.Editor.Panels
         
         public void UpdateData()
         {
-            _bindingsData = _diExplorerService.GetAllBindings();
-            _instancesData = _diExplorerService.GetAllInstances();
+            _bindingsData = _diExplorerService.GetAllBindings()
+                .GroupBy(bindingData => bindingData.TypeName)
+                .Select(grouping => grouping.First())
+                .ToArray();
+            
+            _instancesData = _diExplorerService.GetAllInstances()
+                .GroupBy(bindingData => bindingData.TypeName)
+                .Select(grouping => (grouping.First(), grouping.Count()))
+                .ToArray();
         }
 
         public void UpdateDataByContainer(string containerName)
         {
             _bindingsData = _diExplorerService.GetBindings(containerName);
-            _instancesData = _diExplorerService.GetInstances(containerName);
+            
+            _instancesData = _diExplorerService.GetInstances(containerName)
+                .GroupBy(bindingData => bindingData.TypeName)
+                .Select(grouping => (grouping.First(), grouping.Count()))
+                .ToArray();
         }
 
-        public IEnumerable<GUIContent> CreateInstancesContent(Rect position)
+        public IEnumerable<(GUIContent Content, int Count)> CreateInstancesContent(Rect position)
         {
             _realtimeInstances.Clear();
             
@@ -94,41 +111,53 @@ namespace DiExplorer.Editor.Panels
             foreach (var instanceData in _instancesData)
             {
                 var icon = EditorGUIUtility.IconContent(DynamicMonoIconName).image;
+                var isShowInstance = false;
                 
-                switch (instanceData.InstanceType)
+                switch (instanceData.Data.InstanceType)
                 {
                     case InstanceType.NoMono:
                     {
                         icon = EditorGUIUtility.IconContent(NoMonoIconName).image;
+                        isShowInstance = ShowNoMonoInstances;
                         break;
                     }
                     case InstanceType.DynamicMono:
                     {
                         icon = EditorGUIUtility.IconContent(DynamicMonoIconName).image;
+                        isShowInstance = ShowDynamicMonoInstances;
                         break;
                     }
                     case InstanceType.SceneMono:
                     {
                         icon = EditorGUIUtility.IconContent(SceneMonoIconName).image;
+                        isShowInstance = ShowSceneMonoInstances;
                         break;
                     }
                 }
                 
-                var maxTextLength = (int)Mathf.Round(position.width / 2f - 160f);
-                var instanceTypeName = CutString(instanceData.TypeName, maxTextLength);
+                var maxTextLength = (int)Mathf.Round(position.width / 2f - 220f);
+                var instanceTypeName = CutString(instanceData.Data.TypeName, maxTextLength);
+
+                if (!isShowInstance) continue;
                 
                 var pattern = SearchString;
-                
+
                 if (_searchGroup == SearchGroup.Instances)
                 {
-                    if (RegexExtension.IsContainMatch(pattern, instanceData.TypeName))
+                    if (RegexExtension.IsContainMatch(pattern, instanceData.Data.TypeName))
                     {
-                        _realtimeInstances.Add(new GUIContent(instanceTypeName, icon, instanceData.TypeName));
+                        var tuple = (new GUIContent(instanceTypeName, icon, instanceData.Data.TypeName),
+                            instanceData.Count);
+                        
+                        _realtimeInstances.Add(tuple);
                     }
                 }
                 else
                 {
-                    _realtimeInstances.Add(new GUIContent(instanceTypeName, icon, instanceData.TypeName));
+                    var tuple = (new GUIContent(instanceTypeName, icon, instanceData.Data.TypeName),
+                        instanceData.Count);
+                    
+                    _realtimeInstances.Add(tuple);
                 }
             }
 
@@ -173,7 +202,7 @@ namespace DiExplorer.Editor.Panels
             
             if (RealtimeSelectedIndex != Unselected && RealtimeSelectedIndex < _realtimeInstances.Count)
             {
-                var selectedInstanceTypeName = _realtimeInstances[RealtimeSelectedIndex].tooltip;
+                var selectedInstanceTypeName = _realtimeInstances[RealtimeSelectedIndex].Content.tooltip;
                 var injectablesName = _diExplorerService.GetInjectableNamesFromInstance(selectedInstanceTypeName);
                 var icon = EditorGUIUtility.IconContent(BoxColliderIconName).image;
                 
@@ -214,6 +243,21 @@ namespace DiExplorer.Editor.Panels
             return relatedItems;
         }
 
+        public void SetShowNoMono(bool value)
+        {
+            ShowNoMonoInstances = value;
+        }
+
+        public void SetShowDynamicMono(bool value)
+        {
+            ShowDynamicMonoInstances = value;
+        }
+
+        public void SetShowSceneMono(bool value)
+        {
+            ShowSceneMonoInstances = value;
+        }
+
         public void SetSearchString(string value, SearchGroup searchGroup)
         {
             SearchString = value;
@@ -233,6 +277,18 @@ namespace DiExplorer.Editor.Panels
         public void SetRelatedItemSelectedIndex(int index)
         {
             RelatedItemSelectedIndex = index;
+            InstancesIsScrollToIndex = false;
+            BindingsIsScrollToIndex = false;
+        }
+
+        public void SetInstancesIsScrollToIndex(bool value)
+        {
+            InstancesIsScrollToIndex = value;
+        }
+
+        public void SetBindingsIsScrollToIndex(bool value)
+        {
+            BindingsIsScrollToIndex = value;
         }
 
         public void ResetSelectedIndexExceptInstances()
@@ -267,12 +323,14 @@ namespace DiExplorer.Editor.Panels
             var menu = new GenericMenu();
 
             var iconName = content[itemIndex].image.name;
-            
-            menu.AddItem(new GUIContent("Show in Project"), false, () => ShowInProject(content, itemIndex));
+
+            menu.AddItem(new GUIContent("Show in Project"), false,
+                () => InstanceInfoEditorExtension.ShowInProjectFile(content, itemIndex));
             
             if (iconName == DynamicMonoIconName || iconName == SceneMonoIconName)
             {
-                menu.AddItem(new GUIContent("Show in Hierarchy"), false, () => ShowInHierarchy(content, itemIndex));
+                menu.AddItem(new GUIContent("Show in Hierarchy"), false,
+                    () => InstanceInfoEditorExtension.ShowInHierarchyInstance(content, itemIndex));
             }
             
             menu.ShowAsContext();
@@ -282,83 +340,16 @@ namespace DiExplorer.Editor.Panels
         {
             var menu = new GenericMenu();
 
-            menu.AddItem(new GUIContent("Show in Project"), false, () => ShowInProject(content, itemIndex));
-            menu.AddItem(new GUIContent("Show in Hierarchy"), false, () => ShowInHierarchy(content, itemIndex));
+            menu.AddItem(new GUIContent("Show in Project"), false,
+                () => InstanceInfoEditorExtension.ShowInProjectFile(content, itemIndex));
+            
+            menu.AddItem(new GUIContent("Show in Hierarchy"), false,
+                () => InstanceInfoEditorExtension.ShowInHierarchyInstance(content, itemIndex));
 
             menu.ShowAsContext();
         }
 
-        public void ShowInProject(IReadOnlyList<GUIContent> content, int index)
-        {
-            Debug.Log("Project " + content[index].text);
-            
-            var instanceTypeName = content[index].text;
-            var pattern = "[^.]+$";
-
-            var match = RegexExtension.FindMatch(pattern, instanceTypeName);
-            
-            if (!match.Success)
-            {
-                Debug.LogWarning($"[{nameof(BindingsWindow)}] {content[index].text} Not found from Project!");
-                return;
-            }
-            
-            var guids = AssetDatabase.FindAssets($"{match.Value} t:Script");
-
-            if (guids.Length > 0)
-            {
-                var path = AssetDatabase.GUIDToAssetPath(guids.First());
-                var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
-
-                if (asset != null)
-                {
-                    EditorGUIUtility.PingObject(asset);
-                }
-                else
-                {
-                    Debug.LogWarning($"[{nameof(BindingsWindow)}] {content[index].text} Asset not found! ");
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"[{nameof(BindingsWindow)}] {content[index].text} No objects of this type were found in the project!");
-            }
-        }
-
-        public void ShowInHierarchy(IReadOnlyList<GUIContent> content, int index)
-        {
-            var instanceTypeName = content[index].text;
-            var pattern = "[^.]+$";
-
-            var match = RegexExtension.FindMatch(pattern, instanceTypeName);
-            
-            if (!match.Success)
-            {
-                Debug.LogWarning($"[{nameof(BindingsWindow)}] {content[index].text} Not found from Project!");
-                return;
-            }
-            
-            var type = FindTypeByName(instanceTypeName);
         
-            if (type == null || !typeof(Component).IsAssignableFrom(type))
-            {
-                Debug.LogWarning($"[{nameof(BindingsWindow)}] {content[index].text} Type not found or not a Component!");
-                return;
-            }
-            
-            var components = Object.FindObjectsOfType(type) as Component[];
-
-            if (components != null && components.Length > 0)
-            {
-                var gameObjects = components.Select(component => component.gameObject).ToArray();
-
-                Selection.objects = gameObjects; // select object
-            }
-            else
-            {
-                Debug.LogWarning($"[{nameof(BindingsWindow)}] {content[index].text} Object not found in the scene!");
-            }
-        }
 
         private void AddInheritorsToContent(string selectedInstanceTypeName, ICollection<GUIContent> relatedItems, Rect position)
         {
@@ -383,24 +374,6 @@ namespace DiExplorer.Editor.Panels
             return baseString.Length * CharacterLength > maxTextLength
                 ? baseString.Substring(0, maxTextLength / CharacterLength) + "..."
                 : baseString;
-        }
-
-        private static Type FindTypeByName(string typeName)
-        {
-            // Find type in the uploaded assemblies
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            
-            foreach (var assembly in assemblies)
-            {
-                var type = assembly.GetType(typeName);
-                
-                if (type != null)
-                {
-                    return type;
-                }
-            }
-            
-            return null;
         }
     }
 }

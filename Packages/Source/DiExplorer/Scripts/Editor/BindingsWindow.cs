@@ -19,6 +19,7 @@ using DiContainerDebugger.Editor.Styles;
 using DiExplorer.Bootstrap;
 using DiExplorer.Editor.Panels;
 using DiExplorer.Entities;
+using DiExplorer.Extensions;
 using DiExplorer.Services;
 using UnityEditor;
 using UnityEngine;
@@ -29,24 +30,23 @@ namespace DiContainerDebugger.Editor
     internal class BindingsWindow : ZenjectEditorWindow
     {
         private const int Unselected = -1;
-        private const string ScriptIconName = "cs Script Icon";
-        private const string CameraIconName = "Camera Icon";
         
+        private readonly Vector2 _minWindowSize = new Vector2(950, 400);
+
         private List<GUIContent> _relatedItems = new List<GUIContent>();
-        private List<GUIContent> _realtimeInstances = new List<GUIContent>();
+        private List<(GUIContent Content, int Count)> _realtimeInstances = new List<(GUIContent, int)>();
         private List<GUIContent> _bindings = new List<GUIContent>();
-        
-        private bool _isShowWindow;
-        private Vector2 _minWindowSize = new Vector2(800, 800);
-        
+
         private Vector2 _relatedItemsScrollPosition;
         private Vector2 _realtimeInstancesScrollPosition;
         private Vector2 _bindingsScrollPosition;
-        
+
         private BindingsPanel.SearchGroup _searchGroup = BindingsPanel.SearchGroup.Bindings;
-        
+
         private GUIContent _passedIcon;
         private GUIContent _errorIcon;
+        
+        private bool _isShowWindow;
 
         private DiExplorerService _diExplorerService;
         private ContextPanel _bindingsContextPanel;
@@ -193,6 +193,15 @@ namespace DiContainerDebugger.Editor
             {
                 EditorGUILayout.Separator();
                 
+                var buttonContent = new GUIContent("Delete Cash", EditorIconExtension.WinCloseIcon.image);
+                
+                if (GUILayout.Button(buttonContent, EditorStyles.miniButton, GUILayout.Width(100f)))
+                {
+                    _diExplorerService.DeleteBindingsSaveFiles();
+                }
+                
+                EditorGUILayout.Separator();
+                
                 // Top Panel
                 EditorGUILayout.BeginHorizontal();
                 {
@@ -242,7 +251,7 @@ namespace DiContainerDebugger.Editor
                         
                         _searchGroup = (BindingsPanel.SearchGroup)selectedIndex;
                         
-                        GUILayout.BeginHorizontal(GUI.skin.FindStyle("Toolbar"));
+                        GUILayout.BeginHorizontal(EditorElementStyle.Toolbar);
                         {
                             _bindingsPanel.SetSearchString(GUILayout.TextField(_bindingsPanel.SearchString,
                                 EditorElementStyle.ToolbarSearchTextField,
@@ -265,9 +274,34 @@ namespace DiContainerDebugger.Editor
                 EditorGUILayout.BeginHorizontal();
                 {
                     // Realtime Instances Zone
-                    EditorGUILayout.BeginVertical(GUILayout.Width(position.width / 2f));
+                    EditorGUILayout.BeginVertical();
                     {
-                        EditorGUILayout.LabelField($"Realtime Instances: {_realtimeInstances.Count}", EditorStyles.boldLabel);
+                        GUILayout.BeginHorizontal();
+                        {
+                            EditorGUILayout.LabelField($"Realtime Instances: {_realtimeInstances.Count}",
+                                EditorStyles.boldLabel, GUILayout.Width(180f));
+
+                            var noMonoIcon = EditorGUIUtility.IconContent(BindingsPanel.NoMonoIconName).image;
+                            var dynamicMonoIcon = EditorGUIUtility.IconContent(BindingsPanel.DynamicMonoIconName).image;
+                            var sceneMonoIcon = EditorGUIUtility.IconContent(BindingsPanel.SceneMonoIconName).image;
+                            
+                            _bindingsPanel.SetShowNoMono(
+                                GUILayout.Toggle(_bindingsPanel.ShowNoMonoInstances, noMonoIcon,
+                                    EditorElementStyle.ToggleDefaultStyle, GUILayout.Width(60f)));
+
+                            _bindingsPanel.SetShowDynamicMono(
+                                GUILayout.Toggle(_bindingsPanel.ShowDynamicMonoInstances, dynamicMonoIcon,
+                                    EditorElementStyle.ToggleDefaultStyle, GUILayout.Width(60f)));
+
+                            _bindingsPanel.SetShowSceneMono(
+                                GUILayout.Toggle(_bindingsPanel.ShowSceneMonoInstances, sceneMonoIcon,
+                                    EditorElementStyle.ToggleDefaultStyle, GUILayout.Width(60f)));
+                            
+                            GUILayout.FlexibleSpace();
+                            GUILayout.Label("Number", GUILayout.Width(87f));
+                        }
+                        GUILayout.EndHorizontal();
+                        
                         _realtimeInstancesScrollPosition =
                             EditorGUILayout.BeginScrollView(_realtimeInstancesScrollPosition,
                                 GUILayout.Height(position.height / 2));
@@ -284,23 +318,37 @@ namespace DiContainerDebugger.Editor
 
                                     if (_bindingsPanel.RelatedItemSelectedIndex != Unselected)
                                     {
-                                        if (_realtimeInstances[i].tooltip ==
+                                        if (_realtimeInstances[i].Content.tooltip ==
                                             _relatedItems[_bindingsPanel.RelatedItemSelectedIndex].tooltip)
                                         {
                                             style = EditorElementStyle.InfoListElementStyle;
+
+                                            if (!_bindingsPanel.InstancesIsScrollToIndex)
+                                            {
+                                                _realtimeInstancesScrollPosition.y = i * 20f;
+                                                _bindingsPanel.SetInstancesIsScrollToIndex(true);
+                                            }
+                                            
                                         }
                                     }
 
-                                    if (GUILayout.Button(_realtimeInstances[i], style,
-                                            GUILayout.Width(position.width / 2f - 100f)))
+                                    if (GUILayout.Button(_realtimeInstances[i].Content, style,
+                                            GUILayout.Width(position.width / 2f - 160f)))
                                     {
-                                        HandleRealtimeInstanceClick(_realtimeInstances, i);
+                                        var contentList = _realtimeInstances.Select(tuple => tuple.Content).ToList();
+                                        HandleRealtimeInstanceClick(contentList, i);
                                     }
 
-                                    if (GUILayout.Button(EditorGUIUtility.IconContent(ScriptIconName).image, style,
+                                    var countInstance = _realtimeInstances[i].Count;
+
+                                    GUILayout.Label(countInstance.ToString(),
+                                        EditorElementStyle.BindingCountLabel);
+                                    
+                                    if (GUILayout.Button(EditorIconExtension.ScriptIcon.image, style,
                                             GUILayout.Width(20f)))
                                     {
-                                        _bindingsPanel.ShowInProject(_realtimeInstances, i);
+                                        var contentList = _realtimeInstances.Select(tuple => tuple.Content).ToList();
+                                        InstanceInfoEditorExtension.ShowInProjectFile(contentList, i);
                                     }
                                 }
                                 GUILayout.EndHorizontal();
@@ -316,6 +364,9 @@ namespace DiContainerDebugger.Editor
                         EditorGUILayout.BeginHorizontal();
                         {
                             GUILayout.Label($"Bindings: {_bindings.Count}", EditorStyles.boldLabel);
+                            GUILayout.FlexibleSpace();
+                            GUILayout.Label("Instances", GUILayout.Width(60f));
+                            GUILayout.Label("Inheritors", GUILayout.Width(64f));
                         }
                         EditorGUILayout.EndHorizontal();
                         
@@ -337,11 +388,17 @@ namespace DiContainerDebugger.Editor
                                         if (_bindings[i].tooltip == _relatedItems[_bindingsPanel.RelatedItemSelectedIndex].tooltip)
                                         {
                                             style = EditorElementStyle.InfoListElementStyle;
+                                            
+                                            if (!_bindingsPanel.BindingsIsScrollToIndex)
+                                            {
+                                                _bindingsScrollPosition.y = i * 20f;
+                                                _bindingsPanel.SetBindingsIsScrollToIndex(true);
+                                            }
                                         }
                                     }
 
                                     if (GUILayout.Button(new GUIContent(_bindings[i]), style,
-                                            GUILayout.Width(position.width / 2f - 183f)))
+                                            GUILayout.Width(position.width / 2f - 185f)))
                                     {
                                         _bindingsPanel.SetBindingSelectedIndex(i);
 
@@ -397,21 +454,22 @@ namespace DiContainerDebugger.Editor
                                     ? EditorElementStyle.SelectedListElementStyle
                                     : EditorElementStyle.ListElementDefaultStyle;
 
-                                if (GUILayout.Button(_relatedItems[i], style, GUILayout.Width(position.width - 125f)))
+                                if (GUILayout.Button(_relatedItems[i], style, 
+                                        GUILayout.Width(position.width - 130f)))
                                 {
                                     HandleRelatedItemsClick(_relatedItems, i);
                                 }
                                 
-                                if (GUILayout.Button(EditorGUIUtility.IconContent(ScriptIconName).image, EditorElementStyle.ListElementDefaultStyle,
-                                        GUILayout.Width(20f)))
+                                if (GUILayout.Button(EditorIconExtension.ScriptIcon.image, 
+                                        EditorElementStyle.ListElementDefaultStyle, GUILayout.Width(20f)))
                                 {
-                                    _bindingsPanel.ShowInProject(_relatedItems, i);
+                                    InstanceInfoEditorExtension.ShowInProjectFile(_relatedItems, i);
                                 }
                                 
-                                if (GUILayout.Button(EditorGUIUtility.IconContent(CameraIconName).image, EditorElementStyle.ListElementDefaultStyle,
-                                        GUILayout.Width(20f)))
+                                if (GUILayout.Button(EditorIconExtension.CameraIcon.image, 
+                                        EditorElementStyle.ListElementDefaultStyle, GUILayout.Width(20f)))
                                 {
-                                    _bindingsPanel.ShowInHierarchy(_relatedItems, i);
+                                    InstanceInfoEditorExtension.ShowInHierarchyInstance(_relatedItems, i);
                                 }
                             }
                             GUILayout.EndHorizontal();
@@ -466,7 +524,5 @@ namespace DiContainerDebugger.Editor
                 _bindingsPanel.ShowRelatedItemContextMenu(content, index);
             }
         }
-        
-       
     }
 }

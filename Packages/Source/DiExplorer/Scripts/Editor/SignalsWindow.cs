@@ -20,6 +20,7 @@ using DiExplorer.Bootstrap;
 using DiExplorer.Data;
 using DiExplorer.Editor.Panels;
 using DiExplorer.Entities;
+using DiExplorer.Extensions;
 using DiExplorer.Services;
 using UnityEditor;
 using UnityEngine;
@@ -29,8 +30,6 @@ namespace DiContainerDebugger.Editor
 {
     internal class SignalsWindow : ZenjectEditorWindow
     {
-        private const int NumberDisplayedSignals = 10;
-        
         private const float WidthSignalNameArea = 200f;
         private const float MinScaleValue = 0.8f;
         private const float MaxScaleValue = 5f;
@@ -38,35 +37,31 @@ namespace DiContainerDebugger.Editor
         private const float MinTimerInEditorOffset = 20f;
         private const float SignalRowHeight = 30f;
 
+        private readonly Vector2 _minWindowSize = new Vector2(800, 400);
+        
         private readonly Color[] _rowColors = { Color.gray, new Color(0.392f, 0.392f, 0.392f, 1f) };
         private readonly Color _colorDividingLine = new Color(0.6352941f, 0.6352941f, 0.6352941f);
-        
+
         private Dictionary<string, List<SignalCallData>> _signalCallsDictionary =
             new Dictionary<string, List<SignalCallData>>();
 
         private List<GUIContent> _signals = new List<GUIContent>();
         private List<GUIContent> _subscriptions = new List<GUIContent>();
-        
-        private bool _isShowWindow;
-        private Vector2 _minWindowSize = new Vector2(800, 800);
-        
+
         private Vector2 _signalsScrollPosition;
         private Vector2 _subscriptionsScrollPosition;
         private Vector2 _signalCallsScrollPosition;
-        
+
         private Vector2 _timelineScrollPos;
         private Vector2 _signalNameScrollPos;
         private Vector2 _signalScrollPos;
-        
+
         private float _scaleValue = 1f;
         private float _timer;
 
+        private bool _isShowWindow;
         private bool _autoScroll = true;
         private bool _forceAutoScroll;
-        
-        private GUIContent _passedIcon;
-        private GUIContent _errorIcon;
-        private GUIContent _scaleIcon;
 
         private DiExplorerService _diExplorerService;
         private ContextPanel _signalsContextPanel;
@@ -109,10 +104,6 @@ namespace DiContainerDebugger.Editor
             _isShowWindow = true;
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
             EditorApplication.update += OnUpdate;
-            
-            _passedIcon = EditorGUIUtility.IconContent("TestPassed");
-            _errorIcon = EditorGUIUtility.IconContent("console.erroricon");
-            _scaleIcon = EditorGUIUtility.IconContent("d_ViewToolZoom");
         }
 
         private void OnDisable()
@@ -232,6 +223,15 @@ namespace DiContainerDebugger.Editor
             EditorGUILayout.BeginVertical();
             {
                 EditorGUILayout.Separator();
+                
+                var buttonContent = new GUIContent("Delete Cash", EditorIconExtension.WinCloseIcon.image);
+                
+                if (GUILayout.Button(buttonContent, EditorStyles.miniButton, GUILayout.Width(100f)))
+                {
+                    _diExplorerService.DeleteSignalsSaveFiles();
+                }
+                
+                EditorGUILayout.Separator();
 
                 // Top Panel
                 EditorGUILayout.BeginHorizontal();
@@ -254,7 +254,9 @@ namespace DiContainerDebugger.Editor
 
                         if (!EditorApplication.isPlaying && _isShowWindow)
                         {
-                            var signalBusStatusIcon = _staticAnalyzer.IsBoundSignalBus ? _passedIcon : _errorIcon;
+                            var signalBusStatusIcon = _staticAnalyzer.IsBoundSignalBus 
+                                ? EditorIconExtension.TestPassedIcon 
+                                : EditorIconExtension.ConsoleErrorIcon;
 
                             GUILayout.Label("SignalBus", GUILayout.Width(65f));
                             GUILayout.Label(signalBusStatusIcon, GUILayout.Width(20f), GUILayout.Height(20f));
@@ -270,7 +272,7 @@ namespace DiContainerDebugger.Editor
                     GUILayout.FlexibleSpace();
 
                     // Subscriptions Search String
-                    GUILayout.BeginHorizontal(GUI.skin.FindStyle("Toolbar"), GUILayout.Width(position.width / 2f));
+                    GUILayout.BeginHorizontal(EditorElementStyle.Toolbar, GUILayout.Width(position.width / 2f));
                     {
                         _signalsPanel.SetSearchString(GUILayout.TextField(_signalsPanel.SubscriptionsSearchString,
                             EditorElementStyle.ToolbarSearchTextField,
@@ -328,9 +330,17 @@ namespace DiContainerDebugger.Editor
                                         ? EditorElementStyle.SelectedListElementStyle
                                         : EditorElementStyle.ListElementDefaultStyle;
 
-                                    if (GUILayout.Button(new GUIContent(_subscriptions[i]), style))
+                                    if (GUILayout.Button(new GUIContent(_subscriptions[i]), style, 
+                                            GUILayout.Width(position.width / 2f - 106f)))
                                     {
                                         _signalsPanel.SetSelectedSubscriptionIndex(i);
+                                    }
+                                    
+                                    if (GUILayout.Button(EditorIconExtension.ScriptIcon.image, 
+                                            EditorElementStyle.ListElementDefaultStyle,
+                                            GUILayout.Width(20f)))
+                                    {
+                                        InstanceInfoEditorExtension.ShowInProjectFile(_subscriptions, i);
                                     }
                                 }
                                 GUILayout.EndHorizontal();
@@ -384,7 +394,7 @@ namespace DiContainerDebugger.Editor
                     {
                         GUILayout.Label($"Timer: {_timer:F2} seconds", EditorStyles.boldLabel);
                         GUILayout.FlexibleSpace();
-                        GUILayout.Label(_scaleIcon, GUILayout.Width(20f), GUILayout.Height(20f));
+                        GUILayout.Label(EditorIconExtension.ZoomIcon, GUILayout.Width(20f), GUILayout.Height(20f));
 
                         var displayedScale = (int)(_scaleValue * 100f);
                         
@@ -402,8 +412,9 @@ namespace DiContainerDebugger.Editor
                         GUILayout.Space(WidthSignalNameArea + 10f);
                         
                         _timelineScrollPos =
-                            EditorGUILayout.BeginScrollView(_timelineScrollPos, GUILayout.Height(40f),
-                                GUILayout.ExpandWidth(true));
+                            EditorGUILayout.BeginScrollView(_timelineScrollPos,
+                                GUIStyle.none, GUIStyle.none, 
+                                GUILayout.Height(20f), GUILayout.ExpandWidth(true));
                         {
                             DrawTimeScale();
                         }
@@ -416,14 +427,12 @@ namespace DiContainerDebugger.Editor
                     // Signal log panel
                     EditorGUILayout.BeginHorizontal();
                     {
-                        var scrollHeightOption = _signalCallsDictionary.Keys.Count > NumberDisplayedSignals
-                            ? GUILayout.ExpandWidth(true)
-                            : GUILayout.Height(SignalRowHeight * _signalCallsDictionary.Keys.Count + 10f);
+                        var scrollHeightOption = GUILayout.ExpandWidth(true);
                         
                         // Signal names
                         _signalNameScrollPos = EditorGUILayout.BeginScrollView(_signalNameScrollPos, 
-                            scrollHeightOption, 
-                            GUILayout.Width(WidthSignalNameArea));
+                            EditorElementStyle.ScrollBarHorizontalLine, GUIStyle.none,
+                            scrollHeightOption, GUILayout.Width(WidthSignalNameArea));
                         {
                             EditorGUILayout.BeginVertical(GUILayout.Width(WidthSignalNameArea));
                             

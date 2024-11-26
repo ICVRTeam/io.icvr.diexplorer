@@ -36,11 +36,19 @@ namespace DiExplorer.Storages
             Debug.LogWarning
             (
                 $"[{nameof(FileDataManager)}] " +
-                $"An attempt to download data from a non-existent file! " +
+                $"An attempt to download data from a non-existent file: {filePath}! " +
                 $"The file will be created when switching to Play Mode."
             );
             
             return string.Empty;
+        }
+
+        public void DeleteCashFile(string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
         }
 
     }

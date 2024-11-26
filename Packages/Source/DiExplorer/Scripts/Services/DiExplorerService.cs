@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using DiExplorer.Containers;
 using DiExplorer.Data;
 using DiExplorer.Entities;
+using DiExplorer.Extensions;
 using DiExplorer.Interfaces;
 using DiExplorer.Storages;
 
@@ -25,8 +26,6 @@ namespace DiExplorer.Services
 {
     internal class DiExplorerService
     {
-        private const string DiExplorerFileName = "DiExplorerSaves.json";
-        
         private List<AbstractContainer> _abstractContainers;
         private InheritorsStorage _inheritorsStorage;
         private DiExplorerModel _diExplorerModel;
@@ -91,57 +90,86 @@ namespace DiExplorer.Services
 
         internal void SaveModel()
         {
-            var savedData = _diExplorerModel.GetSavedData();
-            var savedString = _serializator.Serialize(savedData);
-            _fileDataManager.Save(DiExplorerFileName, savedString);
+            var bindingsSavedData = _diExplorerModel.GetBindingsSavedData();
+            var savedBindingsString = _serializator.Serialize(bindingsSavedData);
+            _fileDataManager.Save(CashFileConst.BindingsFileName, savedBindingsString);
+            
+            var signalsSavedData = _diExplorerModel.GetSignalsSavedData();
+            var savedSignalsString = _serializator.Serialize(signalsSavedData);
+            _fileDataManager.Save(CashFileConst.SignalsFileName, savedSignalsString);
         }
 
         internal void LoadModel()
         {
-            var stringData = _fileDataManager.Load(DiExplorerFileName);
-            var savedData = _serializator.Deserialize<SavedData>(stringData);
+            var bindingsData = LoadBindingsData();
+            var signalsData = LoadSignalsData();
+
+            _diExplorerModel.SetSavedData(bindingsData, signalsData);
+        }
+
+        private BindingsSavedData LoadBindingsData()
+        {
+            var stringBindingsData = _fileDataManager.Load(CashFileConst.BindingsFileName);
+            var savedDataBindings = _serializator.Deserialize<BindingsSavedData>(stringBindingsData);
 
             var containerBindings = new Dictionary<string, BindingData[]>();
             var containerInstances = new Dictionary<string, InstanceData[]>();
+            var inheritors = new Dictionary<string, InheritorsData>();
+
+            if (savedDataBindings.ContainerBindings != null)
+            {
+                containerBindings = savedDataBindings.ContainerBindings;
+            }
+
+            if (savedDataBindings.ContainerInstances != null)
+            {
+                containerInstances = savedDataBindings.ContainerInstances;
+            }
+
+            if (savedDataBindings.Inheritors != null)
+            {
+                inheritors = savedDataBindings.Inheritors;
+            }
+            
+            return new BindingsSavedData(containerBindings, containerInstances, inheritors);
+        }
+
+        private SignalsSavedData LoadSignalsData()
+        {
+            var stringSignalsData = _fileDataManager.Load(CashFileConst.SignalsFileName);
+            var savedDataSignals = _serializator.Deserialize<SignalsSavedData>(stringSignalsData);
+
             var containerSignals = new Dictionary<string, SignalData[]>();
             var containerSubscriptions = new Dictionary<string, SubscriptionData[]>();
             var signalCalls = new Dictionary<string, SignalCallData[]>();
-            var inheritors = new Dictionary<string, InheritorsData>();
-
-            if (savedData.ContainerBindings != null)
-            {
-                containerBindings = savedData.ContainerBindings;
-            }
-
-            if (savedData.ContainerInstances != null)
-            {
-                containerInstances = savedData.ContainerInstances;
-            }
-
-            if (savedData.ContainerSignals != null)
-            {
-                containerSignals = savedData.ContainerSignals;
-            }
-
-            if (savedData.ContainerSubscriptions != null)
-            {
-                containerSubscriptions = savedData.ContainerSubscriptions;
-            }
-
-            if (savedData.SignalCalls != null)
-            {
-                signalCalls = savedData.SignalCalls;
-            }
-
-            if (savedData.Inheritors != null)
-            {
-                inheritors = savedData.Inheritors;
-            }
-
-            var newSavedData = new SavedData(containerBindings, containerInstances, containerSignals,
-                containerSubscriptions, signalCalls, inheritors);
             
-            _diExplorerModel.SetSavedData(newSavedData);
+            if (savedDataSignals.ContainerSignals != null)
+            {
+                containerSignals = savedDataSignals.ContainerSignals;
+            }
+
+            if (savedDataSignals.ContainerSubscriptions != null)
+            {
+                containerSubscriptions = savedDataSignals.ContainerSubscriptions;
+            }
+
+            if (savedDataSignals.SignalCalls != null)
+            {
+                signalCalls = savedDataSignals.SignalCalls;
+            }
+
+            return new SignalsSavedData(containerSignals, containerSubscriptions, signalCalls);
+        }
+
+        public void DeleteBindingsSaveFiles()
+        {
+            _fileDataManager.DeleteCashFile(CashFileConst.BindingsFileName);
+            _fileDataManager.DeleteCashFile(CashFileConst.SceneComponentsFileName);
+        }
+        
+        public void DeleteSignalsSaveFiles()
+        {
+            _fileDataManager.DeleteCashFile(CashFileConst.SignalsFileName);
         }
 
         public BindingData[] GetBindings(string containerName)
