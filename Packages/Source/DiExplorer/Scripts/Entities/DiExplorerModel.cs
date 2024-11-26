@@ -196,51 +196,58 @@ namespace DiExplorer.Entities
             }
         }
 
-        internal SavedData GetSavedData()
+        internal BindingsSavedData GetBindingsSavedData()
         {
-            var savedData = new SavedData(_containerBindings, _containerInstances, _containerSignals,
-                _containerSubscriptions, _signalCalls, _inheritors);
+            var savedData = new BindingsSavedData(_containerBindings, _containerInstances, _inheritors);
+
+            return savedData;
+        }
+        
+        internal SignalsSavedData GetSignalsSavedData()
+        {
+            var savedData = new SignalsSavedData(_containerSignals, _containerSubscriptions, _signalCalls);
 
             return savedData;
         }
 
-        public void SetSavedData(SavedData savedData)
+        public void SetSavedData(BindingsSavedData bindingsSavedData, SignalsSavedData signalsSavedData)
         {
             _containerBindings.Clear();
             _containerInstances.Clear();
+            _inheritors.Clear();
+            
             _containerSignals.Clear();
             _containerSubscriptions.Clear();
             _signalCalls.Clear();
-            _inheritors.Clear();
 
-            foreach (var containerBinding in savedData.ContainerBindings)
+            foreach (var containerBinding in bindingsSavedData.ContainerBindings)
             {
                 _containerBindings.Add(containerBinding.Key, containerBinding.Value);
             }
 
-            foreach (var containerInstance in savedData.ContainerInstances)
+            foreach (var containerInstance in bindingsSavedData.ContainerInstances)
             {
                 _containerInstances.Add(containerInstance.Key, containerInstance.Value);
             }
 
-            foreach (var containerSignal in savedData.ContainerSignals)
+            foreach (var inheritors in bindingsSavedData.Inheritors)
+            {
+                _inheritors.Add(inheritors.Key, inheritors.Value);
+            }
+
+            foreach (var containerSignal in signalsSavedData.ContainerSignals)
             {
                 _containerSignals.Add(containerSignal.Key, containerSignal.Value);
             }
 
-            foreach (var containerSubscription in savedData.ContainerSubscriptions)
+            foreach (var containerSubscription in signalsSavedData.ContainerSubscriptions)
             {
                 _containerSubscriptions.Add(containerSubscription.Key, containerSubscription.Value);   
             }
 
-            foreach (var signalCall in savedData.SignalCalls)
+            foreach (var signalCall in signalsSavedData.SignalCalls)
             {
                 _signalCalls.Add(signalCall.Key, signalCall.Value);
-            }
-            
-            foreach (var inheritors in savedData.Inheritors)
-            {
-                _inheritors.Add(inheritors.Key, inheritors.Value);
             }
         }
     }

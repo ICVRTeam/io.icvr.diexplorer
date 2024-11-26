@@ -104,12 +104,12 @@ namespace DiExplorer.Editor.Panels
             
             if (signalSubscriptions.Count != 0)
             {
-                foreach (var instance in signalSubscriptions)
+                foreach (var subscription in signalSubscriptions)
                 {
                     var pattern = _subscriptionsSearchString;
-                    if (RegexExtension.IsContainMatch(pattern, instance))
+                    if (RegexExtension.IsContainMatch(pattern, subscription))
                     {
-                        subscriptionsContent.Add(new GUIContent(instance));
+                        subscriptionsContent.Add(new GUIContent(subscription, subscription));
                     }
                 }
             }

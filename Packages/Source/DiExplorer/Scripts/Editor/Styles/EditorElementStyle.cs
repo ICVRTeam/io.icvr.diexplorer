@@ -13,6 +13,7 @@
 // is strictly forbidden unless prior written permission is obtained
 // from ICVR LLC.
 
+using UnityEditor;
 using UnityEngine;
 
 namespace DiContainerDebugger.Editor.Styles
@@ -61,6 +62,9 @@ namespace DiContainerDebugger.Editor.Styles
             onNormal = { textColor = SelectedColor },
             onHover = { textColor = SelectedColor }
         };
+
+        public static readonly GUIStyle ScrollBarHorizontalLine = new GUIStyle(GUI.skin.horizontalScrollbar);
+        public static readonly GUIStyle Toolbar = new GUIStyle(GUI.skin.FindStyle("Toolbar"));
         
 #if UNITY_2022_3_OR_NEWER
         public static readonly GUIStyle ToolbarSearchTextField = GUI.skin.FindStyle("ToolbarSearchTextField");

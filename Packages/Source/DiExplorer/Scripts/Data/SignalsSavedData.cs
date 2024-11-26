@@ -17,29 +17,20 @@ using System.Collections.Generic;
 
 namespace DiExplorer.Data
 {
-    internal struct SavedData
+    internal struct SignalsSavedData
     {
-        public readonly Dictionary<string, BindingData[]> ContainerBindings;
-        public readonly Dictionary<string, InstanceData[]> ContainerInstances;
         public readonly Dictionary<string, SignalData[]> ContainerSignals;
         public readonly Dictionary<string, SubscriptionData[]> ContainerSubscriptions;
         public readonly Dictionary<string, SignalCallData[]> SignalCalls;
-        public readonly Dictionary<string, InheritorsData> Inheritors;
 
-        public SavedData(
-            Dictionary<string, BindingData[]> containerBindings,
-            Dictionary<string, InstanceData[]> containerInstances, 
+        public SignalsSavedData(
             Dictionary<string, SignalData[]> containerSignals,
             Dictionary<string, SubscriptionData[]> containerSubscriptions,
-            Dictionary<string, SignalCallData[]> signalCalls,
-            Dictionary<string, InheritorsData> inheritors)
+            Dictionary<string, SignalCallData[]> signalCalls)
         {
-            ContainerBindings = containerBindings;
-            ContainerInstances = containerInstances;
             ContainerSignals = containerSignals;
             ContainerSubscriptions = containerSubscriptions;
             SignalCalls = signalCalls;
-            Inheritors = inheritors;
         }
     }
 }
